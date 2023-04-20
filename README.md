@@ -15,7 +15,7 @@ For Raspi e.g.:
 <pre>
   ./configure --prefix=/usr --with-gles  
 </pre>
-For windows:
+For windows (get msys2 https://www.msys2.org/):<br>
 <pre>
   pacman -S mingw-w64-x86_64-glm
   in configure.ac comment "dnl PKG_CHECK_MODULES(GLU, [glu])  
