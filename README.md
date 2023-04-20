@@ -7,7 +7,9 @@ Allow using a text-only shader (to keep text in simple color, without light).
      
 To build use:
   autoreconf -fis
+  
   ./configure ...
+  
   make
 
 For Raspi e.g.:
@@ -15,8 +17,11 @@ For Raspi e.g.:
 
 For windows:
   pacman -S mingw-w64-x86_64-glm
+  
   in configure.ac comment "dnl PKG_CHECK_MODULES(GLU, [glu])
-  in src/Makefile.am change "_LDFLAGS = -lglu32"
-  ./configure --prefix=/mingw64 --disable-shared
+  
+  in src/Makefile.am change "_LDFLAGS = -lglu32 -no-undefined"
+  
+  ./configure --prefix=/mingw64 
     
     
