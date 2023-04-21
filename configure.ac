@@ -16,12 +16,12 @@ AC_PROG_CPP
 AC_PROG_CXX
 AX_CXX_COMPILE_STDCXX_11(noext, mandatory)
 
-
 AC_DISABLE_STATIC
 
 LT_INIT
 
-PKG_CHECK_MODULES(GLU, [glu])
+AC_CANONICAL_HOST
+AC_MSG_NOTICE([host_os $host_os])
 
 PKG_CHECK_MODULES(FONTCONFIG, [fontconfig])
 
@@ -38,6 +38,12 @@ PKG_CHECK_MODULES(GTKMM,gtkmm-3.0)
 PKG_CHECK_MODULES([GLIBMM], [glibmm-2.4 giomm-2.4])
 
 PKG_CHECK_MODULES([GLM], [glm])
+
+if test "$host_os" = "mingw32" ; then
+    AC_SUBST(EXTRA_LDFLAGS, "-lglu32 -no-undefined")
+else
+    PKG_CHECK_MODULES(GLU, [glu])
+fi
 
 AC_CONFIG_FILES([
 Makefile

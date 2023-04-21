@@ -51,7 +51,7 @@ libgenericglm_la_SOURCES = \
 	Diagram.cpp \
 	StringUtils.cpp
 
-libgenericglm_la_LDFLAGS =
+libgenericglm_la_LDFLAGS = @EXTRA_LDFLAGS@
 
 libgenericglm_la_LIBADD =  \
 	$(FONTCONFIG_LIBS) \
