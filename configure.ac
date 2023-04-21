@@ -2,7 +2,18 @@ dnl Process this file with autoconf to produce a configure script.
 
 AC_CONFIG_MACRO_DIR([m4])
 
-AC_INIT([genericglm],[0.22])
+m4_define([v_maj], [0])
+m4_define([v_min], [2])
+m4_define([v_mic], [2])
+m4_define([project_version], [v_maj.v_min.v_mic])
+m4_define([lt_cur], m4_eval(v_maj + v_min))
+m4_define([lt_rev], [v_mic])
+m4_define([lt_age], [v_min])
+
+AC_INIT([genericglm],[project_version])
+
+version_info="lt_cur:lt_rev:lt_age"
+AC_SUBST([version_info])
 
 AC_CONFIG_HEADERS([config.h])
 
@@ -47,7 +58,7 @@ fi
 
 AC_CONFIG_FILES([
 Makefile
-src/genericglm-0.22.pc
+src/genericglm-${VERSION}.pc
 src/Makefile
 ])
 AC_OUTPUT

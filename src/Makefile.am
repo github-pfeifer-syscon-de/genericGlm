@@ -18,6 +18,9 @@ lib_LTLIBRARIES = libgenericglm.la
 libgenericglm_la_CXXFLAGS = \
 	-Wall
 
+libgenericglm_la_LDFLAGS = \
+	@EXTRA_LDFLAGS@ \
+	-version-info @version_info@
 
 libgenericglm_la_SOURCES = \
 	BaseDialog.cpp \
@@ -51,8 +54,6 @@ libgenericglm_la_SOURCES = \
 	Diagram.cpp \
 	StringUtils.cpp
 
-libgenericglm_la_LDFLAGS = @EXTRA_LDFLAGS@
-
 libgenericglm_la_LIBADD =  \
 	$(FONTCONFIG_LIBS) \
 	$(GLU_LIBS) \
@@ -61,8 +62,9 @@ libgenericglm_la_LIBADD =  \
 	$(EPOXY_LIBS)
 
 
-
-include_HEADERS = \
+## using pkginclude_HEADERS will use include dir with packagename
+##   (include_HEADERS  will use #install#/include)
+pkginclude_HEADERS = \
 	BaseDialog.hpp \
 	GenericGlmCompat.hpp \
 	FbShaderContext.hpp \
@@ -96,7 +98,7 @@ include_HEADERS = \
 	StringUtils.hpp
 
 pkgconfigdir = $(libdir)/pkgconfig
-pkgconfig_DATA = genericglm-0.22.pc
+pkgconfig_DATA = genericglm-$(VERSION).pc
 
 EXTRA_DIST = \
-	genericglm-0.22.pc.in
+	genericglm-$(VERSION).pc.in

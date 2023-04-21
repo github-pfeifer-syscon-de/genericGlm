@@ -3,11 +3,11 @@ exec_prefix=@exec_prefix@
 libdir=@libdir@
 datarootdir=@datarootdir@
 datadir=@datadir@
-includedir=@includedir@/libgenericglm-0.1
+includedir=@includedir@/genericglm
 
 Name: libgenericglm
 Description: Basic openGL rendering support lib.
 Version: @VERSION@
-Requires: 
+Requires:
 Libs: -L${libdir} -lgenericglm
 Cflags: -I${includedir}
