@@ -15,10 +15,7 @@ For Raspi e.g.:
 <pre>
   ./configure --prefix=/usr --with-gles  
 </pre>
-For windows (get msys2 https://www.msys2.org/):<br>
+For windows (get msys2 https://www.msys2.org/) the files shoud adapt use e.g.<br>
 <pre>
-  pacman -S mingw-w64-x86_64-glm
-  in configure.ac comment "dnl PKG_CHECK_MODULES(GLU, [glu])  
-  in src/Makefile.am change "libgenericglm_la_LDFLAGS = -lglu32 -no-undefined"
   ./configure --prefix=/mingw64 
 </pre>   
