@@ -31,16 +31,6 @@
 static std::wstring_convert<std::codecvt_utf8<wchar_t>> converterUtf8;
 // for c++17 deprecated requires use local with facet, but for our purpose the above works fine
 
-
-StringUtils::StringUtils()
-{
-}
-
-
-StringUtils::~StringUtils()
-{
-}
-
 std::wstring
 StringUtils::from_bytesUtf8(const char *in)
 {
@@ -54,27 +44,27 @@ StringUtils::from_bytesUtf8(const std::string &in)
 }
 
 void
-StringUtils::ltrim(std::string &s) {
+StringUtils::ltrim(Glib::ustring &s) {
     s.erase(s.begin(), std::find_if(s.begin(), s.end(), [](unsigned char ch) {
         return !std::isspace(ch);
     }));
 }
 
 void
-StringUtils::rtrim(std::string &s) {
+StringUtils::rtrim(Glib::ustring &s) {
     s.erase(std::find_if(s.rbegin(), s.rend(), [](unsigned char ch) {
         return !std::isspace(ch);
     }).base(), s.end());
 }
 
 void
-StringUtils::trim(std::string &s) {
+StringUtils::trim(Glib::ustring &s) {
     ltrim(s);
     rtrim(s);
 }
 
-std::string
-StringUtils::lower(const std::string &str, int start) {
+Glib::ustring
+StringUtils::lower(const Glib::ustring &str, int start) {
     int i = 0;
     std::string r;
     r.reserve(str.length());
@@ -116,7 +106,7 @@ StringUtils::weekday(int day)
 
 
 void
-StringUtils::split(const std::string &line, char delim, std::vector<std::string> &ret)
+StringUtils::split(const Glib::ustring &line, char delim, std::vector<Glib::ustring> &ret)
 {
     size_t pos = 0;
     while (pos < line.length()) {
@@ -142,6 +132,19 @@ StringUtils::split(const std::string &line, char delim, std::vector<std::string>
         pos = next;
     }
 }
+
+Glib::ustring
+StringUtils::replaceAll(const Glib::ustring& text, const Glib::ustring& replace, const Glib::ustring& with)
+{
+    Glib::ustring ret = text;
+    size_t pos = 0;
+    while ((pos = ret.find(replace, pos)) != Glib::ustring::npos) {
+         ret.replace(pos, replace.length(), with);
+         pos += with.length();
+    }
+    return ret;
+}
+
 
 //std::wstring
 //StringUtils::toWide(const std::string &name) {

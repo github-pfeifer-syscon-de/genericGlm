@@ -4,7 +4,7 @@ AC_CONFIG_MACRO_DIR([m4])
 
 m4_define([v_maj], [0])
 m4_define([v_min], [2])
-m4_define([v_mic], [2])
+m4_define([v_mic], [3])
 m4_define([project_version], [v_maj.v_min.v_mic])
 m4_define([lt_cur], m4_eval(v_maj + v_min))
 m4_define([lt_rev], [v_mic])
@@ -25,7 +25,7 @@ AX_CHECK_ENABLE_DEBUG([info], [DEBUG], [RELEASE], [IS-RELEASE])
 AC_PROG_CC
 AC_PROG_CPP
 AC_PROG_CXX
-AX_CXX_COMPILE_STDCXX_11(noext, mandatory)
+AX_CXX_COMPILE_STDCXX_17(noext, mandatory)
 
 AC_DISABLE_STATIC
 

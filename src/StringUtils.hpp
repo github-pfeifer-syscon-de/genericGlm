@@ -18,32 +18,34 @@
 
 #pragma once
 
+#include <glibmm.h>
 #include <string>
 #include <vector>
 
 class StringUtils {
 public:
-    virtual ~StringUtils();
+    virtual ~StringUtils() = default;
 
     // trim from start (in place)
-    static void ltrim(std::string &s);
+    static void ltrim(Glib::ustring &s);
 
     // trim from end (in place)
-    static void rtrim(std::string &s);
+    static void rtrim(Glib::ustring &s);
 
     // trim from both ends (in place)
-    static void trim(std::string &s);
+    static void trim(Glib::ustring &s);
 
-    static std::string lower(const std::string &s, int start = 0);
+    static Glib::ustring lower(const Glib::ustring &s, int start = 0);
 
     static std::wstring from_bytesUtf8(const char *in);
     static std::wstring from_bytesUtf8(const std::string &in);
 
     static const char *weekday(int day);
-    static void split(const std::string &line, char delim, std::vector<std::string> &ret);
+    static void split(const Glib::ustring &line, char delim, std::vector<Glib::ustring> &ret);
+    static Glib::ustring replaceAll(const Glib::ustring& text, const Glib::ustring& replace, const Glib::ustring& with);
 
 private:
-    StringUtils();
+    StringUtils() = default;
 
 };
 
