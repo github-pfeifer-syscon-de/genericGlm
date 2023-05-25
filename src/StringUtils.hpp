@@ -35,6 +35,10 @@ public:
     // trim from both ends (in place)
     static void trim(Glib::ustring &s);
 
+    static void ltrim(std::string &s);
+    static void rtrim(std::string &s);
+    static void trim(std::string &s);
+
     static Glib::ustring lower(const Glib::ustring &s, int start = 0);
 
     static std::wstring from_bytesUtf8(const char *in);
