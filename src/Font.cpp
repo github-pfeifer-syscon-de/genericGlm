@@ -32,7 +32,7 @@
 #include "NaviContext.hpp"
 
 
-Font::Font(std::string name, GLfloat point_size)   
+Font::Font(std::string name, GLfloat point_size)
 : m_face{nullptr}
 , m_aFace{nullptr}
 , glyphes()
@@ -118,7 +118,7 @@ Font::buildByName(const std::string &name)
 }
 
 std::string
-Font::buildByGlyph(wchar_t glyph)
+Font::buildByGlyph(gunichar glyph)
 {
     FcConfig* config = FcInitLoadConfigAndFonts();
     std::string fontFile;
@@ -199,7 +199,7 @@ void
 Font::createDefault(ShaderContext *ctx)
 {
     for (int i = 32; i < 256; ++i) {
-        wchar_t c = i;
+        gunichar c = i;
         checkGlyph(c, ctx, false);   // Glyph *g =
     }
 }
@@ -214,7 +214,7 @@ Font::debug(ShaderContext *ctx, Matrix &persView, Position &pos, GLfloat scale)
     Position p = pos;
     for (int i = 32; i < 256; i+= 16) {
         for (int j = 0; j < 16; ++j) {
-            wchar_t c = i + j;
+            gunichar c = i + j;
             Glyph *g = checkGlyph(c, ctx, false);
             if (g != nullptr) {
                 Matrix mvp = ctx->setScalePos(persView, p, scale);
@@ -243,7 +243,7 @@ Font::getMWidth()
 }
 
 Glyph *
-Font::checkGlyph(wchar_t glyph, GeometryContext *geometryContext, bool tryAlternate)
+Font::checkGlyph(gunichar glyph, GeometryContext *geometryContext, bool tryAlternate)
 {
     auto s = glyphes.find(glyph);
     if (s != glyphes.end()) {
@@ -264,7 +264,7 @@ Font::checkGlyph(wchar_t glyph, GeometryContext *geometryContext, bool tryAltern
     if (glyph_index > 0) {
         Glyph *pGlyph = new Glyph(glyph, geometryContext);
         if (pGlyph->extractGlyph(library, face, glyph_index)) {
-            glyphes.insert(std::pair<wchar_t, Glyph *>(glyph, pGlyph));
+            glyphes.insert(std::pair<gunichar, Glyph *>(glyph, pGlyph));
             return pGlyph;
         }
         delete pGlyph;  // clean up
@@ -279,7 +279,7 @@ Font::getDefaultFace()
 }
 
 FT_Face
-Font::getAlternateFace(wchar_t glyph)
+Font::getAlternateFace(gunichar glyph)
 {
     if (m_aFace == nullptr) {
         //std::cout << "Font::getAlternateFace glyph 0x" << std::hex << (int)glyph  << std::dec << std::endl;

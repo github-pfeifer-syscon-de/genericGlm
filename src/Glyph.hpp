@@ -36,10 +36,10 @@ class Glyph
 {
 public:
 
-    Glyph(wchar_t _glyph, GeometryContext *geometryContext);
+    Glyph(gunichar _glyph, GeometryContext *geometryContext);
     ~Glyph();
 
-    bool operator==(wchar_t other) {
+    bool operator==(gunichar other) {
         return glyph == other;
     }
     GLfloat getAdvance() {
@@ -67,11 +67,11 @@ public:
     bool extractGlyph(FT_Library library, FT_Face face, FT_UInt glyph_index);
     void addFillPoint(const Position& pos, const Color &c, const Vector &n);
     GLuint getNumVertex();
-    wchar_t getChar() {
+    gunichar getChar() {
         return glyph;
     }
 protected:
-    wchar_t glyph;
+    gunichar glyph;
     GLfloat m_advance;
     GLfloat m_height;
     Geometry m_lineGeom;

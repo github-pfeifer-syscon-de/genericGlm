@@ -60,7 +60,7 @@ class CompareByArea {
     }
 };
 
-Glyph::Glyph(wchar_t _glyph, GeometryContext *geometryContext)
+Glyph::Glyph(gunichar _glyph, GeometryContext *geometryContext)
 : glyph{_glyph}
 , m_lineGeom{GL_LINES, geometryContext}
 , m_fillGeom{GL_TRIANGLES, geometryContext}
