@@ -365,7 +365,10 @@ Glyph::render2tex(FT_Library library, FT_Face face, FT_UInt glyph_index)
         FT_GlyphSlot pglyph = face->glyph;
         FT_Bitmap bmp = pglyph->bitmap;
         GLuint ascender = fixed2float(fontSize.ascender);
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wunused-variable"
         GLfloat descender = fixed2float(fontSize.descender);
+#pragma GCC diagnostic pop
         GLuint rows = bmp.rows;
         GLuint cols = bmp.width;
         GLuint orows = fixed2float(fontSize.height);

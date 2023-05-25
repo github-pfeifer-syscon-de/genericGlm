@@ -11,12 +11,13 @@ AM_CPPFLAGS = \
 	$(GLM_CFLAGS) \
 	$(EPOXY_CFLAGS)
 
-libgenericglm_la_CFLAGS = -Wall
+libgenericglm_la_CFLAGS = \
+	-std=c17 -Wall -pedantic
 
 lib_LTLIBRARIES = libgenericglm.la
 
 libgenericglm_la_CXXFLAGS = \
-	-Wall
+	-Wall -pedantic
 
 libgenericglm_la_LDFLAGS = \
 	@EXTRA_LDFLAGS@ \

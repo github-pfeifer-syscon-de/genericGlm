@@ -87,7 +87,10 @@ void
 TreeNode::setTreeGeometry(TreeGeometry *_treeGeometry) {
     if (m_treeGeometry != nullptr) {
         if (_treeGeometry != nullptr) {
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wunused-variable"
             Position &pos = m_treeGeometry->getPos();
+#pragma GCC diagnostic pop
             _treeGeometry->setPosition(m_treeGeometry->getPos());   // inherit a possibly modified transform
             _treeGeometry->setScale(m_treeGeometry->getScale());
             _treeGeometry->setRotation(m_treeGeometry->getRotation());
