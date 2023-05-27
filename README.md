@@ -23,7 +23,7 @@ For Debian you may need the following steps (prefix # execute with sudo/root pre
 <pre>
 # apt install git build-essential automake libtool
 # apt install  libgtkmm-3.0-dev libglm-dev libglu1-mesa-dev
-> git clone https://github.com/github-pfeifer-syscon-de/genericGlm.git
+> git clone https://github.com/github-pfeifer-syscon-de/genericGlm
 > cd genericGlm
 > in configure.ac change AX_CXX_COMPILE_STDCXX([20]... to ...[17]...
 > autoreconf -fis
