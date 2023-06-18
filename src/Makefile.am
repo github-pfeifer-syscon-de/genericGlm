@@ -8,6 +8,7 @@ AM_CPPFLAGS = \
 	$(GLU_CFLAGS) \
 	$(GTKMM_CFLAGS) \
 	$(GLIBMM_CFLAGS) \
+	$(GENERICIMG_CFLAGS) \
 	$(GLM_CFLAGS) \
 	$(EPOXY_CFLAGS)
 
@@ -52,14 +53,14 @@ libgenericglm_la_SOURCES = \
 	LineShapeRenderer.cpp \
 	TextTreeGeometry.cpp \
 	Buffer.cpp \
-	Diagram.cpp \
-	StringUtils.cpp
+	Diagram.cpp
 
 libgenericglm_la_LIBADD =  \
 	$(FONTCONFIG_LIBS) \
 	$(GLU_LIBS) \
 	$(GTKMM_LIBS) \
 	$(GLIBMM_LIBS) \
+	$(GENERICIMG_LIBS) \
 	$(EPOXY_LIBS)
 
 
@@ -95,8 +96,7 @@ pkginclude_HEADERS = \
 	LineShapeRenderer.hpp \
 	TextTreeGeometry.hpp \
 	Buffer.hpp \
-	Diagram.hpp \
-	StringUtils.hpp
+	Diagram.hpp
 
 pkgconfigdir = $(libdir)/pkgconfig
 pkgconfig_DATA = genericglm-$(VERSION).pc

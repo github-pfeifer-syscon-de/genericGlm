@@ -31,9 +31,9 @@
 #include <glm/vec3.hpp> // glm::vec3
 #include <Matrix.hpp>
 #include <list>
+#include <StringUtils.hpp>
 
 #include "GeometryContext.hpp"
-#include "StringUtils.hpp"
 
 void checkError(const char *where);
 

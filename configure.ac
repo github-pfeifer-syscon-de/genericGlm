@@ -4,7 +4,7 @@ AC_CONFIG_MACRO_DIR([m4])
 
 m4_define([v_maj], [0])
 m4_define([v_min], [2])
-m4_define([v_mic], [3])
+m4_define([v_mic], [4])
 m4_define([project_version], [v_maj.v_min.v_mic])
 m4_define([lt_cur], m4_eval(v_maj + v_min))
 m4_define([lt_rev], [v_mic])
@@ -53,6 +53,8 @@ PKG_CHECK_MODULES(GTKMM,gtkmm-3.0)
 PKG_CHECK_MODULES([GLIBMM], [glibmm-2.4 giomm-2.4])
 
 PKG_CHECK_MODULES([GLM], [glm])
+
+PKG_CHECK_MODULES(GENERICIMG, [genericimg-0.1.0])
 
 if test "$host_os" = "mingw32" ; then
     AC_SUBST(EXTRA_LDFLAGS, "-lglu32 -no-undefined")
