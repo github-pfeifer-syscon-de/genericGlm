@@ -99,7 +99,7 @@ pkginclude_HEADERS = \
 	Diagram.hpp
 
 pkgconfigdir = $(libdir)/pkgconfig
-pkgconfig_DATA = genericglm-$(VERSION).pc
+pkgconfig_DATA = genericglm.pc
 
 EXTRA_DIST = \
-	genericglm-$(VERSION).pc.in
+	genericglm.pc.in
