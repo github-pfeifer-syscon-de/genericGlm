@@ -61,8 +61,14 @@ void Text::display(const Matrix &perspView)
     if (!m_visible) {
         return;
     }
+    GLint restoreProgram = 0;
     if (m_textCtx) {
-        m_shaderCtx->unuse();   // unuse prev.ctx
+        glGetIntegerv(GL_CURRENT_PROGRAM, &restoreProgram);
+        #ifdef DEBUG
+        std::cout << __FILE__ "::display curr"
+          << " prog " << restoreProgram << std::endl;
+        #endif
+        //m_shaderCtx->unuse();   // unuse prev.ctx
         m_textCtx->use();       // prefere a simpler text context for rendering
     }
     if (m_textType == GL_QUADS
@@ -164,10 +170,10 @@ void Text::display(const Matrix &perspView)
     updateClickBounds(mvp);
 
     if (m_textCtx) {
-        m_textCtx->unuse();
-        m_shaderCtx->use();     // restore previous ctx
+        if (restoreProgram > 0) {   // restore previous used seems better
+            glUseProgram(restoreProgram);
+        }
     }
-
 }
 
 
