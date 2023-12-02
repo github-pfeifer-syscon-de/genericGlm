@@ -35,3 +35,20 @@ For Debian you may need the following steps (prefix # execute with sudo/root pre
 # make install
 </pre>
 If you run into trouble with the used c++20 change configure.ac AX_CXX_COMPILE_STDCXX([20]... to ...[17]...
+
+## Navigation
+
+The programs using this lib come with some navigation options:
+
+Without a selection the option work on the whole scene, otherwise for the selected item:
+
+Left click -> select item (only shapes will be selectable (not text)) (some geometries e.g. trees will move dependent entries as well, and some additional infos might be displayed when selected e.g. a process name)
+
+Left double click -> show options like "reset"
+
+Mouse scroll -> change distance
+
+Drag right mouse buttton -> rotate
+
+Drag middle mouse button -> offset
+

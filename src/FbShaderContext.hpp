@@ -18,23 +18,46 @@
 
 #pragma once
 
+#include <memory>
+
 #include "GenericGlmCompat.hpp"
 #include "ShaderContext.hpp"
 
-class FbShaderContext : public ShaderContext {
+class Framebuffer {
+public:
+    Framebuffer();
+    virtual ~Framebuffer();
+
+    void scale(GLuint width, GLuint height, GLint fbSampling, bool depth);
+    void freeBuffer();
+    void bind();
+    void unbind();
+    void bindTexture();
+    GLuint getWidth();
+    GLuint getHeight();
+    GLint getSampling();
+    GLuint getName();
+private:
+    GLuint m_framebufferId;
+    GLuint m_textureId;
+    GLuint m_depthbufId;
+    GLuint atype, type, format;
+    GLuint fbWidth, fbHeight;
+    GLint fbSampling;
+
+};
+
+class FbShaderContext
+: public ShaderContext {
 public:
     FbShaderContext();
 
     virtual ~FbShaderContext();
-    void freeFramebuffer();
-    void createFramebuffer();
     void setup(unsigned int width, unsigned int height, unsigned int sampling);
     void updateLocation() override;
     void prepare();
     void done();
     void draw();
-    //void updateIndexes(guint program);
-    GLuint width, height, atype, type, format;
 
     Matrix setScalePos(const Matrix &m, Position &p, GLfloat scale) override;
     bool useColor() override;
@@ -44,11 +67,12 @@ public:
     void set_clear_color(const Color& clear_color);
 
 private:
-    GLuint m_framebufferId;
-    GLuint m_textureId;
-    GLuint m_depthbufId;
-
-    //GLuint quad_VertexArrayID;
+    //void updateIndexes(guint program);
+    GLuint winWidth, winHeight;
+    std::shared_ptr<Framebuffer> m_renderBuffer;
+    // tried to improve antialiasing with separate buffer
+    //   but using the first buffer with a larger size seems sufficient
+    //std::shared_ptr<Framebuffer> m_resolveBuffer;
     Geometry *m_box;
 
     GLuint m_texLocation;

@@ -503,6 +503,10 @@ Geometry::create_vao() {
     glBindBuffer(GL_ARRAY_BUFFER, 0);
 
     /* the VBO is referenced by the VAO */
+    // the opinion's on that vary a bit "renderdoc" reports this as an api contradiction.
+    //   See https://registry.khronos.org/OpenGL/specs/gl/glspec33.core.pdf D.1.2 Deleted Object and Object Name Lifetimes
+    //   Following the above doc, and as it works fine after all. This change will break the library compatibility, so keep it.
+    //   If you want a "clean" interface move this and the following delete to ::remove
     glDeleteBuffers(1, &buffer);
     if (iboID > 0) {
         glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
@@ -1012,7 +1016,7 @@ Tex::create(GLuint width, GLuint height, const void *data, GLuint type)
     // Create mipmaps for this texture for better image quality
     glGenerateMipmap(GLenum(GL_TEXTURE_2D));
     checkError("TexShaderCtx glGenerateMipmap");
-  
+
     glBindTexture(GL_TEXTURE_2D, 0);
 }
 
