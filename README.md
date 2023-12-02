@@ -34,6 +34,8 @@ For Debian you may need the following steps (prefix # execute with sudo/root pre
 # cd .../genericGlm
 # make install
 </pre>
+The configure step is where needed dependencies will popup (so check "checking for ..." and see if the answer is "yes").
+
 If you run into trouble with the used c++20 change configure.ac AX_CXX_COMPILE_STDCXX([20]... to ...[17]...
 
 ## Navigation
