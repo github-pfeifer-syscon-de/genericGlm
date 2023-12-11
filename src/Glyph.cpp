@@ -60,12 +60,13 @@ class CompareByArea {
     }
 };
 
-Glyph::Glyph(gunichar _glyph, GeometryContext *geometryContext)
+Glyph::Glyph(gunichar _glyph, GeometryContext *geometryContext, GLenum textType)
 : glyph{_glyph}
 , m_lineGeom{GL_LINES, geometryContext}
 , m_fillGeom{GL_TRIANGLES, geometryContext}
 , m_tex{0}
 , m_ctx{geometryContext}
+, m_textType{textType}
 {
 }
 
@@ -287,56 +288,59 @@ Glyph::extractGlyph(FT_Library library, FT_Face face, FT_UInt glyph_index)
         return false;
     }
     FT_Outline* outline = &face->glyph->outline;
-
-    p2t::Polygons polys;
-#ifdef DIRECT_SCAN
-    // allows using contour info from structure
-    //std::cout << std::hex << "0x" << (int)glyph << std::dec
-    //          << " points " << outline->n_points
-    //          << " contours " << outline->n_contours
-    //          << std::endl;
-    int startIdx = 0;      // start index for contour
-    for (int cont = 0; cont < outline->n_contours; ++cont) {
-        int endIdx = outline->contours[cont];       // this index is inclusive
-        if (endIdx - startIdx >= 2) {                // ignore those not making a shape e.g. dejavue 'u' anchor ?
-            auto poly = std::make_shared<struct p2t::Polygon>();
-            poly->addPoints(outline, startIdx, endIdx, cont);
-            polys.push_back(poly);
-        }
-        startIdx = endIdx + 1;
-    }
-#else
-    FT_Outline_Funcs func_interface;
-    func_interface.move_to = (FT_Outline_MoveToFunc)move_to;
-    func_interface.line_to = (FT_Outline_LineToFunc)line_to;
-    func_interface.conic_to = (FT_Outline_ConicToFunc)conic_to;
-    func_interface.cubic_to = (FT_Outline_CubicToFunc)cubic_to;
-    func_interface.shift = 0;
-    func_interface.delta = 0;
-    err = FT_Outline_Decompose(outline, &func_interface, &polys);
-    if (err) {
-        std::cerr << "No decompose 0x" << std::hex << (int)glyph << std::dec << std::endl;
-    }
-#endif
     setAdvance(fixed2float(face->glyph->advance.x));
-    Color col(1.0f, 1.0f, 1.0f);
-    Vector v(0.0f, 1.0f, 0.0f); // make glyphs look up toward light (if need)
-    for (auto poly : polys) { // build lines
-        auto pLast = std::make_shared<PositionDbl>();
-        for (auto p : poly->positions) {
-            if (pLast) {
-                addLine(pLast, p, col, &v);
+    if (m_textType == GL_TRIANGLES) {   // only create if needed
+        p2t::Polygons polys;
+        #ifdef DIRECT_SCAN
+        // allows using contour info from structure
+        //std::cout << std::hex << "0x" << (int)glyph << std::dec
+        //          << " points " << outline->n_points
+        //          << " contours " << outline->n_contours
+        //          << std::endl;
+        int startIdx = 0;      // start index for contour
+        for (int cont = 0; cont < outline->n_contours; ++cont) {
+            int endIdx = outline->contours[cont];       // this index is inclusive
+            if (endIdx - startIdx >= 2) {                // ignore those not making a shape e.g. dejavue 'u' anchor ?
+                auto poly = std::make_shared<struct p2t::Polygon>();
+                poly->addPoints(outline, startIdx, endIdx, cont);
+                polys.push_back(poly);
             }
-            pLast = p;
+            startIdx = endIdx + 1;
+        }
+        #else
+        FT_Outline_Funcs func_interface;
+        func_interface.move_to = (FT_Outline_MoveToFunc)move_to;
+        func_interface.line_to = (FT_Outline_LineToFunc)line_to;
+        func_interface.conic_to = (FT_Outline_ConicToFunc)conic_to;
+        func_interface.cubic_to = (FT_Outline_CubicToFunc)cubic_to;
+        func_interface.shift = 0;
+        func_interface.delta = 0;
+        err = FT_Outline_Decompose(outline, &func_interface, &polys);
+        if (err) {
+            std::cerr << "No decompose 0x" << std::hex << (int)glyph << std::dec << std::endl;
+        }
+        #endif
+        Color col(1.0f, 1.0f, 1.0f);
+        Vector v(0.0f, 1.0f, 0.0f); // make glyphs look up toward light (if need)
+        for (auto poly : polys) { // build lines
+            auto pLast = std::make_shared<PositionDbl>();
+            for (auto p : poly->positions) {
+                if (pLast) {
+                    addLine(pLast, p, col, &v);
+                }
+                pLast = p;
+            }
+        }
+        try {
+            tesselate(polys);
+        }
+        catch (...) {
+            std::cout << "Tesselation failed 0x" << std::hex << (int)glyph << std::dec << std::endl;
         }
     }
-    try {
-        tesselate(polys);
+    if (m_textType == GL_QUADS) {   // only create if needed
+        render2tex(library, face, glyph_index);
     }
-    catch (...) {
-        std::cout << "Tesselation failed 0x" << std::hex << (int)glyph << std::dec << std::endl;
-    }
-    render2tex(library, face, glyph_index);
 
     return true;                // allow also glyphs without shape e.g. space
 }

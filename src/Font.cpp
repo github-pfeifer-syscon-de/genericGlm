@@ -51,9 +51,6 @@ Font::Font(std::string name, GLfloat point_size)
 
 Font::~Font()
 {
-    for (Glyphs::iterator s = glyphes.begin(); s != glyphes.end(); ++s) {
-        delete (s->second);
-    }
     if (m_face) {
         FT_Done_Face(m_face);
     }
@@ -215,8 +212,8 @@ Font::debug(ShaderContext *ctx, Matrix &persView, Position &pos, GLfloat scale)
     for (int i = 32; i < 256; i+= 16) {
         for (int j = 0; j < 16; ++j) {
             gunichar c = i + j;
-            Glyph *g = checkGlyph(c, ctx, false);
-            if (g != nullptr) {
+            auto g = checkGlyph(c, ctx, false);
+            if (g) {
                 Matrix mvp = ctx->setScalePos(persView, p, scale);
                 g->display(mvp);
                 p.x += g->getAdvance() * scale;
@@ -242,8 +239,8 @@ Font::getMWidth()
     return m_face->size->metrics.x_ppem;
 }
 
-Glyph *
-Font::checkGlyph(gunichar glyph, GeometryContext *geometryContext, bool tryAlternate)
+std::shared_ptr<Glyph>
+Font::checkGlyph(gunichar glyph, GeometryContext *geometryContext, GLenum textType, bool tryAlternate)
 {
     auto s = glyphes.find(glyph);
     if (s != glyphes.end()) {
@@ -262,12 +259,11 @@ Font::checkGlyph(gunichar glyph, GeometryContext *geometryContext, bool tryAlter
     }
 
     if (glyph_index > 0) {
-        Glyph *pGlyph = new Glyph(glyph, geometryContext);
+        auto pGlyph = std::make_shared<Glyph>(glyph, geometryContext, textType);
         if (pGlyph->extractGlyph(library, face, glyph_index)) {
-            glyphes.insert(std::pair<gunichar, Glyph *>(glyph, pGlyph));
+            glyphes.emplace(std::pair(glyph, pGlyph));
             return pGlyph;
         }
-        delete pGlyph;  // clean up
     }
     return nullptr;
 }

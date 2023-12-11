@@ -36,7 +36,7 @@ class Glyph
 {
 public:
 
-    Glyph(gunichar _glyph, GeometryContext *geometryContext);
+    Glyph(gunichar _glyph, GeometryContext *geometryContext, GLenum textType);
     ~Glyph();
 
     bool operator==(gunichar other) {
@@ -78,7 +78,7 @@ protected:
     Geometry m_fillGeom;
     GLuint   m_tex;
     GeometryContext *m_ctx;
-
+    GLenum m_textType;
 private:
     void render2tex(FT_Library library, FT_Face face, FT_UInt glyph_index);
 

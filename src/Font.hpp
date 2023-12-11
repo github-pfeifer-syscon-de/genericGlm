@@ -23,7 +23,7 @@
 #include <string>
 #include <unordered_map>
 #include <vector>
-
+#include <memory>
 #include <ft2build.h>
 #include FT_FREETYPE_H
 #include FT_IMAGE_H
@@ -36,7 +36,7 @@
 #include "Glyph.hpp"
 
 // unordered map will be faster on access
-typedef std::unordered_map<gunichar, Glyph *> Glyphs;
+typedef std::unordered_map<gunichar, std::shared_ptr<Glyph>> Glyphs;
 
 /*
  * Basic handling for fonts obtained from fontconfig.
@@ -64,7 +64,7 @@ public:
     FT_Face getDefaultFace();
     FT_Face getAlternateFace(gunichar glyph);
     // get a stored glyph or create it
-    Glyph *checkGlyph(gunichar c, GeometryContext *geometryContext, bool tryAlternate = true);
+    std::shared_ptr<Glyph> checkGlyph(gunichar c, GeometryContext *geometryContext, GLenum textType, bool tryAlternate = true);
     void createDefault(ShaderContext *ctx); // as with more glyphs we run into trouble when we create and display them right away, this function allows pre-creating all latin glyphs
 private:
     FT_Face build(const std::string& path);

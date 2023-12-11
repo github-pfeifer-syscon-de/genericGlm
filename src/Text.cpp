@@ -119,7 +119,7 @@ void Text::display(const Matrix &perspView)
             p += lineskip * (float)line;
         }
         else {
-            Glyph *g = m_font->checkGlyph(c, m_ctx);
+            auto g = m_font->checkGlyph(c, m_ctx, m_textType);
             if (g != nullptr) {
                 if (g->getChar() != c) {
                     std::cout << "Searching 0x" << std::hex << (int)c << " got 0x" << (int)g->getChar() << std::dec << std::endl;
