@@ -52,7 +52,7 @@ static Glyph *pGlyph;
 
 class CompareByArea {
     public:
-    bool operator()(std::shared_ptr<Polygon> a, std::shared_ptr<Polygon> b) {
+    bool operator()(std::shared_ptr<struct p2t::Polygon> a, std::shared_ptr<struct p2t::Polygon> b) {
         const Rect ra = a->bounds();    // better use Bound as these will be more accurate or event all points...
         const Rect rb = b->bounds();
         bool gt = ra.area() > rb.area();
@@ -257,7 +257,7 @@ tessCombineCB(const GLdouble newVertex[3], const GLdouble *neighborVertex[4],
 }
 
 void
-Polygon::gluTess(GLUtesselator *tess)
+p2t::Polygon::gluTess(GLUtesselator *tess)
 {
     gluTessBeginContour(tess);
     for (auto p : positions) {
@@ -288,7 +288,7 @@ Glyph::extractGlyph(FT_Library library, FT_Face face, FT_UInt glyph_index)
     }
     FT_Outline* outline = &face->glyph->outline;
 
-    Polygons polys;
+    p2t::Polygons polys;
 #ifdef DIRECT_SCAN
     // allows using contour info from structure
     //std::cout << std::hex << "0x" << (int)glyph << std::dec
@@ -299,7 +299,7 @@ Glyph::extractGlyph(FT_Library library, FT_Face face, FT_UInt glyph_index)
     for (int cont = 0; cont < outline->n_contours; ++cont) {
         int endIdx = outline->contours[cont];       // this index is inclusive
         if (endIdx - startIdx >= 2) {                // ignore those not making a shape e.g. dejavue 'u' anchor ?
-            auto poly = std::make_shared<Polygon>();
+            auto poly = std::make_shared<struct p2t::Polygon>();
             poly->addPoints(outline, startIdx, endIdx, cont);
             polys.push_back(poly);
         }
@@ -426,17 +426,17 @@ Glyph::render2tex(FT_Library library, FT_Face face, FT_UInt glyph_index)
  * @return TRUE has shape, FALSE empty shape e.g space
  */
 bool
-Glyph::tesselate(Polygons outline)
+Glyph::tesselate(p2t::Polygons outline)
 {
     bool ret = false;
     if (outline.size() > 0) {
-        Polygons nested;        // build nested structure with holes assigned, here only separate polys
+        p2t::Polygons nested;        // build nested structure with holes assigned, here only separate polys
         ret = true;
         outline.sort(CompareByArea());  // sort largest first -> must be outer
         // fine for latin, but we need something better for other languages
         while (!outline.empty()) {
             //std::cout << "Outline size " << outline.size() << std::endl;
-            SharedPoly outer = outline.front();
+            p2t::SharedPoly outer = outline.front();
             outline.pop_front();
             nested.push_back(outer);
             outer->nested(outline);

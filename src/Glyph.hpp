@@ -82,7 +82,7 @@ protected:
 private:
     void render2tex(FT_Library library, FT_Face face, FT_UInt glyph_index);
 
-    bool tesselate(Polygons lines);
+    bool tesselate(p2t::Polygons lines);
     void setAdvance(GLfloat advance);
     void setHeight(GLfloat height);
     void addLine(std::shared_ptr<PositionDbl> pos, std::shared_ptr<PositionDbl> end, Color &c, Vector *n);

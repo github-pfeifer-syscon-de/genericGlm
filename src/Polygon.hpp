@@ -30,21 +30,19 @@
 
 #include "PositionDbl.hpp"
 
+namespace p2t { // use namespace as somewhere windose has a Polygon defined
+
 enum class Bezier {
     none,
     quad,
     cubic
 };
-
-
-namespace p2t {
-class Point;
-}
-
-struct Polygon ;
-
+    
+struct Polygon;
 typedef std::shared_ptr<Polygon> SharedPoly;
 typedef std::list<SharedPoly> Polygons;
+
+class Point;
 
 struct Polygon {
     Positions positions;
@@ -54,11 +52,11 @@ struct Polygon {
     std::vector<std::shared_ptr<Polygon>> holes;
     Rect bound;
     Bound outer;
-    std::vector<std::shared_ptr<p2t::Point>> posTemp;
+    std::vector<std::shared_ptr<Point>> posTemp;
     Polygon();
 
 
-    std::vector<p2t::Point*> toTess();
+    std::vector<Point*> toTess();
     void nested(Polygons &outline);
     double isLeft(const SharedPos& P0, const SharedPos& P1, const PositionDbl& P2);
     int windingNumber(const PositionDbl& P);
@@ -73,3 +71,4 @@ struct Polygon {
     void clearTemp();
 };
 
+}   // namespace p2t

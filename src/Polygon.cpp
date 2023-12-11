@@ -22,6 +22,8 @@
 
 #include "Polygon.hpp"
 
+namespace p2t { // use namespace as somewhere windose has a Polygon defined
+
 static const int BEZIER_POINTS = 2; // as we use a relative small display size this shoud be sufficient as 5 points lead to immense amount of vertexes e.g. > 400 for a 8 ...
 
 
@@ -315,3 +317,5 @@ Polygon::nested(Polygons &outline)
         //rect = inner;
     }
 }
+
+}   // namespace p2t
