@@ -45,24 +45,9 @@ public:
     GLfloat getAdvance() {
         return m_advance;
     }
-    void displayLine(Matrix &mv) {
-        if (m_lineGeom.getNumVertex() > 0) {     // allow glyphes without shape e.g. space
-            m_lineGeom.display(mv);
-        }
-    }
-    void display(Matrix &mv) {
-        if (m_fillGeom.getNumVertex() > 0) {     // allow glyphes without shape e.g. space
-            m_fillGeom.display(mv);
-        }
-    }
-    GLint bindTexture() {
-        if (m_tex > 0) {
-            glBindTexture(GL_TEXTURE_2D, m_tex);
-            checkError("TexShaderCtx glBindTextures");
-        }
-        return m_tex;
-    }
-
+    void displayLine(Matrix &mv);
+    void display(Matrix &mv);
+    GLint bindTexture();
 
     bool extractGlyph(FT_Library library, FT_Face face, FT_UInt glyph_index);
     void addFillPoint(const Position& pos, const Color &c, const Vector &n);

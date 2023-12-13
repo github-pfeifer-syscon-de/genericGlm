@@ -15,6 +15,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include <iostream>
 #include <glm/vec4.hpp> // vec4
 #include <glm/ext.hpp>
 #define GLM_ENABLE_EXPERIMENTAL
@@ -139,9 +140,11 @@ void Text::display(const Matrix &perspView)
                     g->displayLine(mvp);
                 }
                 else {
-                    if (g->getNumVertex() > 0) { // allow glyphes without shape e.g. space (even if this value comes from a different world)
-                        g->bindTexture();
+                    if (g->bindTexture() > 0) { // allow glyphes without shape e.g. space (even if this value comes from a different world)
                         Geometry::display(mvp);
+                    }
+                    else {
+                        std::cout << __FILE__ << ".display tried to use texture for " << c << ", but was not available!" << std::endl;
                     }
                 }
                 float dist = g->getAdvance();
