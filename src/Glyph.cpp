@@ -60,13 +60,12 @@ class CompareByArea {
     }
 };
 
-Glyph::Glyph(gunichar _glyph, GeometryContext *geometryContext, GLenum textType)
+Glyph::Glyph(gunichar _glyph, GeometryContext *geometryContext)
 : glyph{_glyph}
 , m_lineGeom{GL_LINES, geometryContext}
 , m_fillGeom{GL_TRIANGLES, geometryContext}
 , m_tex{0}
 , m_ctx{geometryContext}
-, m_textType{textType}
 {
 }
 
@@ -274,22 +273,11 @@ p2t::Polygon::gluTess(GLUtesselator *tess)
 
 #endif
 
-bool
-Glyph::extractGlyph(FT_Library library, FT_Face face, FT_UInt glyph_index)
+void
+Glyph::buildLineTriangels(FT_Library library, FT_Face face, FT_UInt glyph_index)
 {
     pGlyph = this;
-
-//  std::cout << "Glyph indx " << glyph_index << std::endl;
-
-    FT_Error err = FT_Load_Glyph(face, glyph_index, FT_LOAD_NO_BITMAP);
-    if (err) {
-        std::cerr << "No glyph 0x" << std::hex << (int)glyph << std::dec
-                  << " index " << glyph_index << std::endl;
-        return false;
-    }
     FT_Outline* outline = &face->glyph->outline;
-    setAdvance(fixed2float(face->glyph->advance.x));
-    //if (m_textType == GL_TRIANGLES) {   // would by nice only create if needed, but we did not make all implementations conform to this
     p2t::Polygons polys;
     #ifdef DIRECT_SCAN
     // allows using contour info from structure
@@ -337,11 +325,31 @@ Glyph::extractGlyph(FT_Library library, FT_Face face, FT_UInt glyph_index)
     catch (...) {
         std::cout << "Tesselation failed 0x" << std::hex << (int)glyph << std::dec << std::endl;
     }
-    //}
-    //if (m_textType == GL_QUADS) {   // see above option but not viable
-    render2tex(library, face, glyph_index);
-    //}
+}
 
+bool
+Glyph::extractGlyph(FT_Library library, FT_Face face, FT_UInt glyph_index, GLenum textType)
+{
+
+//  std::cout << "Glyph indx " << glyph_index << std::endl;
+
+    FT_Error err = FT_Load_Glyph(face, glyph_index, FT_LOAD_NO_BITMAP);
+    if (err) {
+        std::cerr << __FILE__ << "::extractGlyph no glyph 0x" << std::hex << (int)glyph << std::dec
+                  << " index " << glyph_index << std::endl;
+        return false;
+    }
+    setAdvance(fixed2float(face->glyph->advance.x));
+    if (textType == GL_TRIANGLES) {
+        buildLineTriangels(library, face, glyph_index);
+    }
+    else if (textType == GL_QUADS) {
+        render2tex(library, face, glyph_index);
+    }
+    else {  // in case of unknown build all
+        std::cout << __FILE__ << "::extractGlyph unknown build " << textType
+                  << " " << glyph_index << std::endl;
+    }
     return true;                // allow also glyphs without shape e.g. space
 }
 

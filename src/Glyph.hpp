@@ -36,7 +36,7 @@ class Glyph
 {
 public:
 
-    Glyph(gunichar _glyph, GeometryContext *geometryContext, GLenum textType);
+    Glyph(gunichar _glyph, GeometryContext *geometryContext);
     ~Glyph();
 
     bool operator==(gunichar other) {
@@ -49,7 +49,7 @@ public:
     void display(Matrix &mv);
     GLint bindTexture();
 
-    bool extractGlyph(FT_Library library, FT_Face face, FT_UInt glyph_index);
+    bool extractGlyph(FT_Library library, FT_Face face, FT_UInt glyph_index, GLenum textType);
     void addFillPoint(const Position& pos, const Color &c, const Vector &n);
     GLuint getNumVertex();
     gunichar getChar() {
@@ -63,9 +63,9 @@ protected:
     Geometry m_fillGeom;
     GLuint   m_tex;
     GeometryContext *m_ctx;
-    GLenum m_textType;
 private:
     void render2tex(FT_Library library, FT_Face face, FT_UInt glyph_index);
+    void buildLineTriangels(FT_Library library, FT_Face face, FT_UInt glyph_index);
 
     bool tesselate(p2t::Polygons lines);
     void setAdvance(GLfloat advance);

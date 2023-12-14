@@ -65,7 +65,7 @@ public:
     FT_Face getAlternateFace(gunichar glyph);
     // get a stored glyph or create it
     std::shared_ptr<Glyph> checkGlyph(gunichar c, GeometryContext *geometryContext, GLenum textType, bool tryAlternate = true);
-    void createDefault(ShaderContext *ctx); // as with more glyphs we run into trouble when we create and display them right away, this function allows pre-creating all latin glyphs
+    void createDefault(ShaderContext *ctx, GLenum textType); // as with more glyphs we run into trouble when we create and display them right away, this function allows pre-creating all latin glyphs
 private:
     FT_Face build(const std::string& path);
     std::string buildByGlyph(gunichar glyph);

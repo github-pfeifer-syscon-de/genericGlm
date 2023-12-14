@@ -193,11 +193,11 @@ Font::buildByGlyph(gunichar glyph)
 }
 
 void
-Font::createDefault(ShaderContext *ctx)
+Font::createDefault(ShaderContext *ctx, GLenum textType)
 {
     for (int i = 32; i < 256; ++i) {
         gunichar c = i;
-        checkGlyph(c, ctx, false);   // Glyph *g =
+        checkGlyph(c, ctx, textType, false);   // Glyph *g =
     }
 }
 
@@ -212,7 +212,7 @@ Font::debug(ShaderContext *ctx, Matrix &persView, Position &pos, GLfloat scale)
     for (int i = 32; i < 256; i+= 16) {
         for (int j = 0; j < 16; ++j) {
             gunichar c = i + j;
-            auto g = checkGlyph(c, ctx, false);
+            auto g = checkGlyph(c, ctx, GL_TRIANGLES, false);
             if (g) {
                 Matrix mvp = ctx->setScalePos(persView, p, scale);
                 g->display(mvp);
@@ -259,8 +259,8 @@ Font::checkGlyph(gunichar glyph, GeometryContext *geometryContext, GLenum textTy
     }
 
     if (glyph_index > 0) {
-        auto pGlyph = std::make_shared<Glyph>(glyph, geometryContext, textType);
-        if (pGlyph->extractGlyph(library, face, glyph_index)) {
+        auto pGlyph = std::make_shared<Glyph>(glyph, geometryContext);
+        if (pGlyph->extractGlyph(library, face, glyph_index, textType)) {
             glyphes.emplace(std::pair(glyph, pGlyph));
             return pGlyph;
         }
