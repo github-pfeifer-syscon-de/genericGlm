@@ -40,9 +40,7 @@ GeometryContext::GeometryContext()
 
 GeometryContext::~GeometryContext()
 {
-    std::list<Geometry *>::iterator p;
-    for (p = geometries.begin(); p != geometries.end(); ++p) {
-        Geometry *geo = *p;
+    for (auto geo : geometries) {
         geo->setContext(nullptr);  // let any geometry forget about this context
                                 //   as when destructing happens in a slightly illogic way
                                 //     we dont want to try a remove that crashes
@@ -51,14 +49,14 @@ GeometryContext::~GeometryContext()
 }
 
 void
-GeometryContext::addGeometry(Geometry *geo)
+GeometryContext::addGeometry(Displayable *geo)
 {
-    geo->m_removeFromctx = true;
+    geo->setRemoveFromCtx(true);
     geometries.push_back(geo);
 }
 
  void
- GeometryContext::removeGeometry(Geometry *geo)
+ GeometryContext::removeGeometry(Displayable *geo)
  {
      geometries.remove(geo);
  }
@@ -160,9 +158,7 @@ GeometryContext::useNormalMap() {
  void
  GeometryContext::setAllVisible(bool visible)
 {
-    std::list<Geometry *>::iterator p;
-    for (p = geometries.begin(); p != geometries.end(); ++p) {
-        Geometry *g = *p;
+    for (auto g : geometries) {
         g->setVisible(visible);
     }
 }

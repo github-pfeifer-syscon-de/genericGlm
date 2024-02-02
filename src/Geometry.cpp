@@ -19,13 +19,7 @@
 #include <math.h>
 #include <cmath>
 #include <vector>
-#include <glm/vec4.hpp> // vec4
-#include <glm/ext.hpp>
 #define GLM_ENABLE_EXPERIMENTAL
-#include <glm/gtc/matrix_transform.hpp>
-#include <glm/gtx/transform.hpp>
-#include <glm/gtc/quaternion.hpp>   // euler
-#include <glm/gtx/euler_angles.hpp> // eulerAngleYXZ
 #include <glm/gtx/normal.hpp> // triangleNormal
 
 #include "Geometry.hpp"
@@ -47,18 +41,11 @@ checkError(const char *where)
 
 
 Geometry::Geometry(GLenum type, GeometryContext *_ctx)
-: m_removeFromctx{false}
+: Displayable(_ctx)
 , geometries()
 , m_master{nullptr}
 , m_type{type}
-, m_ctx{_ctx}
-, m_transform{1.0f}
-, m_pos{0.0f}
-, m_scale{1.0f}
-, m_rotate{0.0f,0.0f,0.0f}
 , debugGeom{nullptr}
-, m_markable{true}
-, m_visible{true}
 , m_sensitivity{0.0f}
 , m_min{999.0f}
 , m_max{-999.0f}
@@ -88,38 +75,53 @@ Geometry::remove()
     //   - belonging to a context
     //   - belonging to a geometry
     if (m_master) {
-        //std::cout << "remove " << std::hex << this << " from " << std::hex << m_master << std::endl;
+        //std::cout << "remove " << std::hex << this << " from master " << std::hex << m_master << std::endl;
         m_master->removeGeometry(this);
     }
     else {
       if (m_ctx && m_removeFromctx) {
+          //std::cout << "remove " << std::hex << this << " from ctx " << std::hex << m_ctx << std::endl;
           m_ctx->removeGeometry(this);
       }
     }
-    //std::cout << "remove " << std::hex << this << " size " << geometries.size()  << std::endl;
-    //int n = 0;
-    for (auto p = geometries.begin(); p != geometries.end(); ++p) {
-        Geometry *chld = *p;
+    //std::cout << "remove " << std::hex << this << " size " << geometries.size() << " remove " << (m_removeChildren ? "y" : "n") << std::endl;
+    int n = 0;
+    for (auto p = geometries.begin(); p != geometries.end(); ++p, ++n) {
+        auto chld = *p;
         //std::cout << "loop " << std::hex << this << " remove " << std::hex << chld << " pos " << n << std::endl;
-        chld->m_master = nullptr;  // prevent iterator hassles, by preventing inner remove from list
+        chld->resetMaster();  // prevent iterator hassles, by preventing inner remove from list
         if (m_removeChildren) {
             delete chld;
         }
-        //++n;
+
     }
     geometries.clear();
+    //std::cout << "remove " << std::hex << this << " destr lsnr " << destructionListeners.size() << std::endl;
     for (auto p = destructionListeners.begin(); p != destructionListeners.end(); ++p) {
         GeometryDestructionListener *lsnr = *p;
         lsnr->geometryDestroyed(this);
     }
     destructionListeners.clear();
+    //std::cout << "remove " << std::hex << this << " delete vertex arr " << std::endl;
+    deleteVertexArray();
+}
+
+void
+Geometry::deleteVertexArray()
+{
     /* destroy all the resources we created */
     if (m_vao != 0) {
+        //std::cout << "deleteVertexArray " << std::hex << this << " delete vertex arr " << std::endl;
         glDeleteVertexArrays(1, &m_vao);
         m_vao = 0;
     }
-    m_min = Position(999.0f);
-    m_max = Position(-999.0f);
+}
+
+void
+Geometry::resetMaster()
+{
+    //std::cout << "resetMaster " << std::hex << this << std::endl;
+    m_master = nullptr;
 }
 
 void
@@ -200,77 +202,6 @@ Geometry::addIndex(int idx1, int idx2, int idx3)
     m_indexes.push_back(idx2);
     m_indexes.push_back(idx3);
 }
-
-void
-Geometry::setScalePos(float _x, float _y, float _z, float _scale)
-{
-    m_pos.x = _x;
-    m_pos.y = _y;
-    m_pos.z = _z;
-    m_scale = _scale;
-    updateTransform();
-}
-
-void
-Geometry::setPosition(Position &pos)
-{
-    m_pos = pos;
-    updateTransform();
-}
-
-Position&
-Geometry::getPosition()
-{
-    return m_pos;
-}
-
-void
-Geometry::setScale(float _scale)
-{
-    m_scale = _scale;
-    updateTransform();
-}
-
-
-void
-Geometry::updateTransform()
-{
-    //Position p = m_pos;
-    //glm::vec3 s(m_scale);
-    //glm::mat4 eulerMat = glm::eulerAngleYX(m_rotate.phiRadians(), m_rotate.thetaRadians());
-    //m_transform = glm::scale(glm::translate(glm::mat4(1.0f), p), s) * eulerMat;
-
-    glm::mat4 translation = glm::translate(glm::mat4(1.0f), getPos());
-    glm::mat4 rotation = glm::eulerAngleYXZ(m_rotate.phiRadians(), m_rotate.thetaRadians(), m_rotate.psiRadians());
-    glm::mat4 scaling = glm::scale(glm::mat4(1.0f), glm::vec3(m_scale));
-    m_transform = translation * rotation * scaling;
-}
-
-void
-Geometry::setRotation(const Rotational &rotate)
-{
-    m_rotate = rotate;
-    updateTransform();
-}
-
-Rotational &
-Geometry::getRotation()
-{
-    return m_rotate;
-}
-
-float
-Geometry::getScale()
-{
-    return m_scale;
-}
-
-Position &
-Geometry::getPos()
-{
-    return m_pos;
-}
-
 
 void
 Geometry::addLine(Position &p1, Position &p2, Color &c, Vector *n) {
@@ -573,8 +504,7 @@ Geometry::addGeometry(Geometry *geo)
         return;     // or throw exception ?
     }
     geo->setMaster(this);
-    for (auto p = geometries.begin(); p != geometries.end(); ++p) {
-        Geometry *pG = *p;
+    for (auto pG : geometries) {
         if (geo == pG) {
             return;     // keep references unique (use set ?)
         }
@@ -596,16 +526,10 @@ Geometry::removeGeometry(Geometry *geo)
     geo->m_master = nullptr;
 }
 
-std::list<Geometry *> &
+std::list<Displayable *> &
 Geometry::getGeometries()
 {
     return geometries;
-}
-
-void
-Geometry::setContext(GeometryContext *ctx)
-{
-    m_ctx = ctx;
 }
 
 void
@@ -756,13 +680,6 @@ Geometry::setDebugGeometry(Geometry *geo)
 {
     debugGeom = geo;
 }
-
-Matrix &
-Geometry::getTransform()
-{
-    return m_transform;
-}
-
 /*
  * get the transform for geometry that includes all parent transforms.
  */
@@ -776,12 +693,6 @@ Geometry::getConcatTransform()
         // possible optimization store concat and invalidate if parent changes ...
         return m_master->getConcatTransform() * m_transform;    // the order for this matters
     }
-}
-
-void
-Geometry::setTransform(Matrix &m)
-{
-    m_transform = m;
 }
 
 void
@@ -914,31 +825,11 @@ Geometry::hit(float x, float y)
     return false;
 }
 
-bool
-Geometry::isMarkable()
-{
-    return m_markable;
-}
-
-void
-Geometry::setMarkable(bool markable)
-{
-    m_markable = markable;
-}
-
-bool
-Geometry::isVisible()
-{
-    return m_visible;
-}
-
 void
 Geometry::setVisible(bool visible)
 {
-    m_visible = visible;
-    std::list<Geometry *>::iterator p;
-    for (p = geometries.begin(); p != geometries.end(); ++p) {
-        Geometry *g = *p;
+    Displayable::setVisible(visible);
+    for (auto g : geometries) {
         g->setVisible(visible);
     }
 }

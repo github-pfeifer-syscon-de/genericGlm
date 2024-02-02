@@ -34,11 +34,11 @@ public:
     void setMvp(glm::mat4 &mvp);
     Geometry *createGeometry(GLenum type);
     void display(const Matrix &perspectiveView);
-    void display(const Matrix &perspectiveView, std::list<Geometry *> &geometries);
+    void display(const Matrix &perspectiveView, std::list<Displayable *> &geometries);
     Geometry *hit(float x, float y);
 protected:
     virtual void updateLocation() override;
-    Geometry *hit(float x, float y, std::list<Geometry *> &chldGeos);
+    Displayable *hit(float x, float y, std::list<Displayable *> &chldGeos);
 
 private:
     GLint m_mvp_location;

@@ -28,6 +28,7 @@ libgenericglm_la_SOURCES = \
 	BaseDialog.cpp \
 	FbShaderContext.cpp \
 	Font.cpp \
+	Displayable.cpp \
 	Geometry.cpp \
 	GeometryContext.cpp \
 	glarea-error.c \
@@ -53,7 +54,8 @@ libgenericglm_la_SOURCES = \
 	LineShapeRenderer.cpp \
 	TextTreeGeometry.cpp \
 	Buffer.cpp \
-	Diagram.cpp
+	Diagram.cpp \
+	NamedTreeNode.cpp
 
 libgenericglm_la_LIBADD =  \
 	$(FONTCONFIG_LIBS) \
@@ -71,6 +73,7 @@ pkginclude_HEADERS = \
 	GenericGlmCompat.hpp \
 	FbShaderContext.hpp \
 	Font.hpp \
+	Displayable.hpp \
 	Geometry.hpp \
 	GeometryContext.hpp \
 	glarea-error.h \
@@ -96,7 +99,8 @@ pkginclude_HEADERS = \
 	LineShapeRenderer.hpp \
 	TextTreeGeometry.hpp \
 	Buffer.hpp \
-	Diagram.hpp
+	Diagram.hpp \
+	NamedTreeNode.hpp
 
 pkgconfigdir = $(libdir)/pkgconfig
 pkgconfig_DATA = genericglm.pc

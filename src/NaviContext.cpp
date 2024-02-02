@@ -81,10 +81,9 @@ NaviContext::display(const Matrix &perspectiveView)
 }
 
 void
-NaviContext::display(const Matrix &perspectiveView, std::list<Geometry *> &geometries)
+NaviContext::display(const Matrix &perspectiveView, std::list<Displayable *> &geometries)
 {
-    for (auto p = geometries.begin(); p != geometries.end(); ++p) {
-        Geometry *g = *p;
+    for (auto g : geometries) {
         glm::mat4 mvp = setModel(perspectiveView, g->getTransform());
         g->display(perspectiveView);
         g->updateClickBounds(mvp);
@@ -95,19 +94,19 @@ NaviContext::display(const Matrix &perspectiveView, std::list<Geometry *> &geome
 Geometry *
 NaviContext::hit(float x, float y)
 {
-    Geometry *next_selected = hit(x, y, geometries);
+    auto next_selected = hit(x, y, geometries);
+    auto geo = dynamic_cast<Geometry*>(next_selected);
     //if (next_selected != nullptr) {
     //    std::cout << "Selected " << typeid(*next_selected).name() << std::endl;
     //}
-    return next_selected;
+    return geo;
 }
 
-Geometry *
-NaviContext::hit(float x, float y, std::list<Geometry *> &chldGeos)
+Displayable *
+NaviContext::hit(float x, float y, std::list<Displayable *> &chldGeos)
 {
-    Geometry *next_selected = nullptr;
-    for (auto p = chldGeos.begin(); p != chldGeos.end(); ++p) { // breadth first
-        Geometry *g = *p;
+    Displayable *next_selected = nullptr;
+    for (auto g : chldGeos) { // breadth first
         if (g->hit(x, y)) {
             if (next_selected == nullptr
              || next_selected->getViewMin().z > g->getViewMin().z) {
@@ -117,9 +116,8 @@ NaviContext::hit(float x, float y, std::list<Geometry *> &chldGeos)
         }
     }
     if (next_selected == nullptr) {  // unsure recuse even with selection to find better match ? (and what is a better match ???)
-        for (auto p = chldGeos.begin(); p != chldGeos.end(); ++p) {
-            Geometry *g = *p;
-            std::list<Geometry *> &nextGeos = g->getGeometries();
+        for (auto g : chldGeos) {
+            auto nextGeos = g->getGeometries();
             next_selected = hit(x, y, nextGeos);
             if (next_selected != nullptr) {
                 break;

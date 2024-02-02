@@ -20,9 +20,10 @@
 
 
 #include <vector>
-
+#include <list>
 
 class Geometry;
+class Displayable;
 class TextContext;
 
 class GeometryContext
@@ -30,8 +31,8 @@ class GeometryContext
 public:
     GeometryContext();
     virtual ~GeometryContext();
-    void addGeometry(Geometry *geo);
-    void removeGeometry(Geometry *geo);
+    void addGeometry(Displayable *geo);
+    void removeGeometry(Displayable *geo);
     int getPositionIndex();
     int getColorIndex();
     int getNormalIndex();
@@ -54,7 +55,7 @@ protected:
     int m_normMapTangentIndex;
     int m_normMapBitangentIndex;
 
-    std::list<Geometry *> geometries;
+    std::list<Displayable *> geometries;
 private:
     TextContext *m_text_context;
 };

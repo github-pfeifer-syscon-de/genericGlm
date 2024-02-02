@@ -27,28 +27,16 @@
 #include <vector>
 #include <list>
 #include <string>
-#include <glm/vec2.hpp> // glm::vec2
-#include <glm/vec3.hpp> // glm::vec3
-#include <Matrix.hpp>
-#include <list>
 #include <StringUtils.hpp>
 
 #include "GeometryContext.hpp"
-
+#include "Displayable.hpp"
 void checkError(const char *where);
 
 // as these primitives are required for geometry define them here
 
 
-typedef glm::vec3 Vector;
 
-typedef glm::vec2 UV;
-
-typedef glm::vec3 Position;
-
-typedef glm::vec3 Color;
-
-typedef glm::vec4 ColorAlpha;
 
 typedef struct vertex_info vertex_info;
 
@@ -89,6 +77,7 @@ typedef std::vector<GLushort> Indexes;
 typedef class Geometry Geometry;
 
 class Geometry
+: public Displayable
 {
 public:
     Geometry(GLenum type, GeometryContext *ctx);
@@ -112,54 +101,33 @@ public:
     void addIndex(int idx);
     void addIndex(int idx1, int idx2);
     void addIndex(int idx1, int idx2, int idx3);
-    void setScalePos(float _x, float _y, float _z, float _scale);
-    void setPosition(Position &pos);
-    Position& getPosition();
-    virtual void setScale(float _scale);
-    void updateTransform();
-    void setRotation(const Rotational &rotate);
-    Rotational &getRotation();
-    float getScale();
-    Position &getPos();
-    Matrix &getTransform();
     Matrix getConcatTransform();
-    void setTransform(Matrix &m);
     void updateClickBounds(glm::mat4 &mvp);
-    bool hit(float x, float y);
-    Position &getViewMin();
+    bool hit(float x, float y) override;
+    Position &getViewMin() override;
     Position &getModelMin();
     Position &getModelMax();
     static void min(Position &set, const Position &other);
     static void max(Position &set, const Position &other);
-    void setMarkable(bool markable);
-    bool isMarkable();
     void addGeometry(Geometry *geo);
     virtual void setMaster(Geometry *geo);
     void removeGeometry(Geometry *geo);
-    std::list<Geometry *> &getGeometries();
-    void setContext(GeometryContext *ctx);
-    bool m_removeFromctx;
+    std::list<Displayable *> &getGeometries();
     void setDebugGeometry(Geometry *geo);
+    void resetMaster() override;
     void setRemoveChildren(bool removeChildren);
     bool isRemoveChildren();
     void remove();
-    bool isVisible();
-    virtual void setVisible(bool visible);
+    virtual void setVisible(bool visible) override;
     void setSensitivity(float sensitivity);
     void addDestructionListener(GeometryDestructionListener *listener);
     void removeDestructionListener(GeometryDestructionListener *listener);
+    void deleteVertexArray();
 protected:
-    std::list<Geometry *> geometries;
+    std::list<Displayable *> geometries;
     Geometry *m_master;
     GLenum m_type;
-    GeometryContext *m_ctx;
-    Matrix m_transform;
-    Position m_pos;
-    float m_scale;
-    Rotational m_rotate;
     Geometry *debugGeom;
-    bool m_markable;
-    bool m_visible;
     float m_sensitivity;
     Position m_min,m_max;
     Position v_min,v_max;
