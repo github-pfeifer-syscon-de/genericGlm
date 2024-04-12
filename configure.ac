@@ -54,7 +54,7 @@ PKG_CHECK_MODULES([GLIBMM], [glibmm-2.4 giomm-2.4])
 
 PKG_CHECK_MODULES([GLM], [glm])
 
-PKG_CHECK_MODULES([GENERICIMG], [genericimg >= 0.1.0])
+PKG_CHECK_MODULES([GENERICIMG], [genericimg >= 0.3.1])
 
 if test "$host_os" = "mingw32" ; then
     AC_SUBST(EXTRA_LDFLAGS, "-lglu32 -no-undefined")
