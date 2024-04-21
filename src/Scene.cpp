@@ -26,8 +26,6 @@
 
 Scene::Scene()
 : m_markContext{nullptr}
-, m_mark{nullptr}
-, m_selected{nullptr}
 {
 }
 
@@ -81,7 +79,7 @@ Scene::on_motion_notify_event(GdkEventMotion* event, float mx, float my)
     return true;
 }
 
-Geometry *
+psc::gl::aptrGeom2
 Scene::on_click_select(GdkEventButton* event, float mx, float my)
 {
     return nullptr;
@@ -106,29 +104,31 @@ Scene::createMarkContext()
 bool
 Scene::on_click(GdkEventButton* event, float mx, float my)
 {
-    Geometry *selected = on_click_select(event, mx, my);
+    auto selected = on_click_select(event, mx, my);
     if (selected != m_selected) {
         selectionChanged(m_selected, selected);
-        if (m_selected != nullptr) {
-            m_selected->removeDestructionListener(this);
-        }
-        if (selected != nullptr) {       // keep track of removed elements as they might be animated so they will vanish
-            selected->addDestructionListener(this);
-        }
+        //if (m_selected != nullptr) {
+        //    m_selected->removeDestructionListener(this);
+        //}
+        //if (selected != nullptr) {       // keep track of removed elements as they might be animated so they will vanish
+        //    selected->addDestructionListener(this);
+        //}
         m_selected = selected;
         createMarkContext();
-        if (m_mark != nullptr) {
-            delete m_mark;
-            m_mark = nullptr;
-        }
+        //if (m_mark != nullptr) {
+        //    delete m_mark;
+        //    m_mark = nullptr;
+        //}
         m_mark = createMark();
+        //std::cout << "created mark " << m_mark << std::endl;
         return true;
     }
     return false;
 }
 
 bool
-Scene::selectionChanged(Geometry *prev_selected, Geometry *selected) {
+Scene::selectionChanged(const psc::gl::aptrGeom2& prev_selected, const psc::gl::aptrGeom2& selected)
+{
     // allow customized actions on selection
     return false;
 }
@@ -139,14 +139,14 @@ Scene::getAddEventMask()
     return (Gdk::EventMask)0;
 }
 
-Geometry *
+psc::gl::aptrGeom2
 Scene::getSelected()
 {
     return m_selected;
 }
 
 void
-Scene::setSelected(Geometry *selected)
+Scene::setSelected(const psc::gl::aptrGeom2& selected)
 {
     m_selected = selected;
 }
@@ -155,87 +155,97 @@ void
 Scene::unrealizeMark()
 {
     //std::cout << "Scene::unrealize" << std::endl;
-    if (m_mark != nullptr) {
-        delete m_mark;
-        m_mark = nullptr;
-    }
+    //if (m_mark != nullptr) {
+    //    delete m_mark;
+    //    m_mark = nullptr;
+    //}
+    m_mark.reset();
     if (m_markContext != nullptr) {
         delete m_markContext;
     }
 }
 
-void
-Scene::geometryDestroyed(Geometry *node) {
-    if (node == m_selected) {
-        m_selected = nullptr;   // avoid stall references
-        if (m_mark != nullptr) {   // and remove related
-            delete m_mark;
-            m_mark = nullptr;
-        }
-    }
-}
 
 void
 Scene::showMark(Gtk::GLArea *glArea, Matrix &proj, Matrix &view)
 {
+    //psc::mem::active_debug = true;
     if (m_markContext != nullptr
-     && m_mark != nullptr) {
+     && m_mark) {
         m_markContext->use();
-        checkError("useMarkCtx");
+        //std::cout << "m_markContext->use " << std::hex << m_markContext << std::dec << std::endl;
+        psc::gl::checkError("useMarkCtx");
         Matrix mv = proj * view;
-        Matrix mvp = mv  * m_selected->getConcatTransform();
-        m_markContext->setMvp(mvp);
-        glLineWidth(getSampling()); // increase line with with sampling, so it shoud be visible
-        m_mark->display(mv);
-        checkError("markDisp");
+        //std::cout << "m_selected "  << m_selected << std::endl;
+        if (auto lsel = m_selected.lease()) {
+            //std::cout << "m_selected.lease "  << lsel << std::endl;
+            Matrix mvp = mv  * lsel->getConcatTransform();
+            m_markContext->setMvp(mvp);
+            glLineWidth(getSampling()); // increase line with with sampling, so it shoud be visible
+            //std::cout << "m_mark " << m_mark << std::endl;
+            if (auto lmark = m_mark.lease()) {
+                //std::cout << "m_mark.lease " << lmark << std::endl;
+                lmark->display(mv);
+                psc::gl::checkError("markDisp");
+            }
+        }
+        //std::cout << "m_markContext->unuse" << std::endl;
         m_markContext->unuse();
-        checkError("unuseMark");
+        psc::gl::checkError("unuseMark");
     }
+    //psc::mem::active_debug = false;
 }
 
-Geometry *
+psc::gl::aptrGeom2
 Scene::createMark()
 {
-    if (m_selected != nullptr
+    psc::gl::aptrGeom2 mark;
+    if (m_selected
      && m_markContext != nullptr) {
-        Position &min = m_selected->getModelMin();
-        Position &max = m_selected->getModelMax();
-        Geometry *mark = new Geometry(GL_LINES, m_markContext);
-        // transfrom here has no meaning as we want a dynamic updated mark
-        mark->setMarkable(false);
-        Position pm0(min.x, min.y, min.z);
-        Position pm1(max.x, min.y, min.z);
-        Position pm2(max.x, max.y, min.z);
-        Position pm3(min.x, max.y, min.z);
-        Position pm4(min.x, min.y, max.z);
-        Position pm5(max.x, min.y, max.z);
-        Position pm6(max.x, max.y, max.z);
-        Position pm7(min.x, max.y, max.z);
-        Color c(1.0f);
-        mark->addPoint(&pm0, &c, nullptr, nullptr);
-        mark->addPoint(&pm1, &c, nullptr, nullptr);
-        mark->addPoint(&pm2, &c, nullptr, nullptr);
-        mark->addPoint(&pm3, &c, nullptr, nullptr);
-        mark->addPoint(&pm4, &c, nullptr, nullptr);
-        mark->addPoint(&pm5, &c, nullptr, nullptr);
-        mark->addPoint(&pm6, &c, nullptr, nullptr);
-        mark->addPoint(&pm7, &c, nullptr, nullptr);
-        mark->addIndex(0, 1);   // front
-        mark->addIndex(1, 2);
-        mark->addIndex(2, 3);
-        mark->addIndex(3, 0);
-        mark->addIndex(0, 4);   // bottom
-        mark->addIndex(4, 5);
-        mark->addIndex(5, 1);
-        mark->addIndex(5, 6);   // right
-        mark->addIndex(6, 2);
-        mark->addIndex(6, 7);   // top
-        mark->addIndex(7, 3);
-        mark->addIndex(4, 7);   // left
-        mark->create_vao();
-        return mark;
+        if (auto lselected = m_selected.lease()) {
+            Position &min = lselected->getModelMin();
+            Position &max = lselected->getModelMax();
+            mark = psc::mem::make_active<psc::gl::Geom2>(GL_LINES, m_markContext);
+            //std::cout << "creating mark " << mark << std::endl;
+            // transfrom here has no meaning as we want a dynamic updated mark
+            if (auto lmark = mark.lease()) {
+                lmark->setMarkable(false);
+                lmark->setName("mark");
+                Position pm0(min.x, min.y, min.z);
+                Position pm1(max.x, min.y, min.z);
+                Position pm2(max.x, max.y, min.z);
+                Position pm3(min.x, max.y, min.z);
+                Position pm4(min.x, min.y, max.z);
+                Position pm5(max.x, min.y, max.z);
+                Position pm6(max.x, max.y, max.z);
+                Position pm7(min.x, max.y, max.z);
+                Color c(1.0f);
+                lmark->addPoint(&pm0, &c);
+                lmark->addPoint(&pm1, &c);
+                lmark->addPoint(&pm2, &c);
+                lmark->addPoint(&pm3, &c);
+                lmark->addPoint(&pm4, &c);
+                lmark->addPoint(&pm5, &c);
+                lmark->addPoint(&pm6, &c);
+                lmark->addPoint(&pm7, &c);
+                lmark->addIndex(0, 1);   // front
+                lmark->addIndex(1, 2);
+                lmark->addIndex(2, 3);
+                lmark->addIndex(3, 0);
+                lmark->addIndex(0, 4);   // bottom
+                lmark->addIndex(4, 5);
+                lmark->addIndex(5, 1);
+                lmark->addIndex(5, 6);   // right
+                lmark->addIndex(6, 2);
+                lmark->addIndex(6, 7);   // top
+                lmark->addIndex(7, 3);
+                lmark->addIndex(4, 7);   // left
+                lmark->create_vao();
+                std::cout << "creating vao mark " << mark << std::endl;
+            }
+        }
     }
-    return nullptr;
+    return mark;
 }
 
 void

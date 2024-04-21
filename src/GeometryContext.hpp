@@ -22,6 +22,15 @@
 #include <vector>
 #include <list>
 
+#include "active_ptr.hpp"
+
+namespace psc {
+namespace gl {
+    class Geom2;
+    typedef psc::mem::active_ptr<Geom2> aptrGeom2;
+} /* namespace gl */
+} /*namespace psc */
+
 class Geometry;
 class Displayable;
 class TextContext;
@@ -32,6 +41,7 @@ public:
     GeometryContext();
     virtual ~GeometryContext();
     void addGeometry(Displayable *geo);
+    void addGeometry(const psc::gl::aptrGeom2& geo);
     void removeGeometry(Displayable *geo);
     int getPositionIndex();
     int getColorIndex();
@@ -56,6 +66,7 @@ protected:
     int m_normMapBitangentIndex;
 
     std::list<Displayable *> geometries;
+    std::list<psc::gl::aptrGeom2> geom2;
 private:
     TextContext *m_text_context;
 };

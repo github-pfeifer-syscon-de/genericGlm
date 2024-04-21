@@ -18,6 +18,10 @@
 #include <glibmm.h>
 
 #include "FbShaderContext.hpp"
+#include "glarea-error.h"
+#include "Geometry.hpp"
+
+void checkError(const char*);
 
 #undef FB_DEBUG
 

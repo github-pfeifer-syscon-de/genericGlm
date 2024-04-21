@@ -3,8 +3,8 @@ dnl Process this file with autoconf to produce a configure script.
 AC_CONFIG_MACRO_DIR([m4])
 
 m4_define([v_maj], [0])
-m4_define([v_min], [2])
-m4_define([v_mic], [7])
+m4_define([v_min], [3])
+m4_define([v_mic], [0])
 m4_define([project_version], [v_maj.v_min.v_mic])
 m4_define([lt_cur], m4_eval(v_maj + v_min))
 m4_define([lt_rev], [v_mic])
@@ -25,10 +25,8 @@ AX_CHECK_ENABLE_DEBUG([info], [DEBUG], [RELEASE], [IS-RELEASE])
 AC_PROG_CC
 AC_PROG_CPP
 AC_PROG_CXX
-dnl we depend on c++20 in just one place (glglobe),
-dnl (did choose it for consistency across libs and programs)
-dnl so if you happen to find yourself in the need to use
-dnl a older compiler, c++17 should work as well.
+dnl we depend on c++20 in some places,
+dnl with an older compiler, c++17 might work as well with some adaptions.
 AX_CXX_COMPILE_STDCXX([20], [noext], [optional])
 
 AC_DISABLE_STATIC
@@ -64,6 +62,7 @@ fi
 
 AC_CONFIG_FILES([
 Makefile
+test/Makefile
 src/genericglm.pc
 src/Makefile
 ])

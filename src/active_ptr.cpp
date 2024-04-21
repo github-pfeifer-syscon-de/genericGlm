@@ -1,5 +1,6 @@
+/* -*- Mode: c++; indent-tabs-mode: t; c-basic-offset: 4; tab-width: 4; coding: utf-8; -*-  */
 /*
- * Copyright (C) 2018 rpf
+ * Copyright (C) 2023 RPf <gpl3@pfeifer-syscon.de>
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -15,31 +16,15 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#pragma once
 
-#include "GenericGlmCompat.hpp"
-#include <glm/mat4x4.hpp> // glm::mat4
 
-class Rotational {
-public:
-    Rotational(float phi = 0.0f, float theta = 180.0f, float psi = 0.0f);
-    Rotational(const Rotational& orig) = default;
-    virtual ~Rotational() = default;
+#include "active_ptr.hpp"
 
-    void add(float phi, float theta, float psi);
-    void add(const Rotational &rot);
-    float phiRadians();
-    float thetaRadians();
-    float psiRadians();
-    static float deg2radians(float deg);
-    float getPhi();
-    float getTheta();
-    float getPsi();
-private:
-    float  phi;
-    float  theta;
-    float  psi;
-};
+namespace psc {
+namespace mem {
 
-typedef glm::mat4 Matrix;
 
+
+
+} /* namespace mem */
+} /* namespace psc */

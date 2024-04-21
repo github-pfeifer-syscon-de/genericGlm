@@ -18,14 +18,19 @@
 
 #pragma once
 
-#include "GenericGlmCompat.hpp"
-
 #include <glibmm.h>
 
-#include "Matrix.hpp"
-#include "Geometry.hpp"
+#include "GenericGlmCompat.hpp"
+#include "GeometryContext.hpp"
 
-class ShaderContext : public GeometryContext {
+#include "Matrix.hpp"
+#include "Displayable.hpp"
+
+class Geometry;
+
+class ShaderContext
+: public GeometryContext
+{
 public:
     ShaderContext();
     virtual ~ShaderContext();

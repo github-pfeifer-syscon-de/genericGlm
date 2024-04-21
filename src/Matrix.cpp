@@ -29,17 +29,6 @@ Rotational::Rotational(float _phi, float _theta, float _psi)
 {
 }
 
-Rotational::Rotational(const Rotational& orig)
-: phi{orig.phi}
-, theta{orig.theta}
-, psi{orig.psi}
-{
-}
-
-Rotational::~Rotational()
-{
-}
-
 void
 Rotational::add(float _phi, float _theta, float _psi)
 {
@@ -59,7 +48,7 @@ Rotational::add(const Rotational &rot)
 float
 Rotational::deg2radians(float deg)
 {
-    return deg * G_PI / 180.0f;
+    return static_cast<float>(deg * G_PI / 180.0);
 }
 
 float

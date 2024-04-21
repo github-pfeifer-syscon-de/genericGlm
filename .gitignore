@@ -44,3 +44,10 @@
 /PKGBUILD
 /src/configure.ac
 /src/genericglm.pc
+/test-driver
+/test/test-suite.log
+/test/Makefile.in
+/test/Makefile
+/test/ptr_test.trs
+/test/ptr_test.log
+/test/ptr_test

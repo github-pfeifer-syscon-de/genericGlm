@@ -1,5 +1,6 @@
+/* -*- Mode: c++; indent-tabs-mode: t; c-basic-offset: 4; tab-width: 4; coding: utf-8; -*-  */
 /*
- * Copyright (C) 2018 rpf
+ * Copyright (C) 2024 RPf <gpl3@pfeifer-syscon.de>
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -15,9 +16,8 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-
 #include <glibmm.h>
-#include <math.h>
+#include <cmath>
 #include <cstdlib>
 #include <iostream>
 #include <iomanip>
@@ -33,6 +33,9 @@
 #define CALLBACK
 #endif
 
+#include "Glyph2.hpp"
+
+
 // scan outline ourself (less c pointer magic) or use functions FT_ if undefined
 #define DIRECT_SCAN 1
 
@@ -42,94 +45,21 @@
 // glu will be used otherwise which does overall a excellent job related to the effort.
 #undef POLY2TRI
 
-#include "Glyph.hpp"
-
 #ifdef POLY2TRI
 #include "poly2tri.h"
 #endif
 
-static Glyph *pGlyph;
 
-class CompareByArea {
-    public:
-    bool operator()(std::shared_ptr<struct p2t::Polygon> a, std::shared_ptr<struct p2t::Polygon> b) {
-        const Rect ra = a->bounds();    // better use Bound as these will be more accurate or event all points...
-        const Rect rb = b->bounds();
-        bool gt = ra.area() > rb.area();
-        return gt;
-    }
-};
+namespace psc {
+namespace gl {
+class Glyph2;
+} /* namespace psc */
+} /* namespace gl */
 
-Glyph::Glyph(gunichar _glyph, GeometryContext *geometryContext)
-: glyph{_glyph}
-, m_lineGeom{GL_LINES, geometryContext}
-, m_fillGeom{GL_TRIANGLES, geometryContext}
-, m_tex{0}
-, m_ctx{geometryContext}
-{
-}
+static psc::gl::Glyph2 *pGlyph2;
 
-Glyph::~Glyph()
-{
-    if (m_tex > 0) {
-        glDeleteTextures(1, &m_tex);
-        m_tex = 0;
-    }
-}
-
-
-#ifndef DIRECT_SCAN
-
-static int
-move_to(const FT_Vector *to, Polygons *lines)
-{
-    SharedPoly next = std::make_shared<Polygon>();
-    std::shared_ptr<PositionDbl> pos = std::make_shared<PositionDbl>(*to);
-    next->positions.push_back(pos);
-    lines->push_back(next);
-
-    last = pos;
-    return 0;
-}
-
-static int
-line_to(const FT_Vector *to, Polygons *lines)
-{
-    std::shared_ptr<PositionDbl> pos = std::make_shared<PositionDbl>(*to);
-    SharedPoly poly = lines->back();
-    poly->positions.push_back(pos);
-
-    last = pos;
-    return 0;
-}
-
-static int
-conic_to( const FT_Vector *control, const FT_Vector *to, Polygons *lines)
-{
-    std::shared_ptr<PositionDbl> p0 = last;
-    std::shared_ptr<PositionDbl> p1 = std::make_shared<PositionDbl>(*control);
-    std::shared_ptr<PositionDbl> p2 = std::make_shared<PositionDbl>(*to);
-    SharedPoly poly = lines->back();
-    poly->quadric_bezier(p0, p1, p2, BEZIER_POINTS);
-    last = p2;
-    return 0;
-}
-
-static int
-cubic_to( const FT_Vector *control1, const FT_Vector *control2, const FT_Vector *to, Polygons *lines)
-{
-    std::shared_ptr<PositionDbl> p0 = last;
-    std::shared_ptr<PositionDbl> p1 = std::make_shared<PositionDbl>(*control1);
-    std::shared_ptr<PositionDbl> p2 = std::make_shared<PositionDbl>(*control2);
-    std::shared_ptr<PositionDbl> p3 = std::make_shared<PositionDbl>(*to);
-    SharedPoly poly = lines->back();
-    poly->cubic_bezier(p0, p1, p2, p3, BEZIER_POINTS);
-    last = p3;
-    return 0;
-}
-#endif
-
-const char* getPrimitiveType(GLenum type)
+static const char*
+getPrimitiveType2(GLenum type)
 {
     switch(type)
     {
@@ -166,29 +96,30 @@ const char* getPrimitiveType(GLenum type)
     }
     return "?";
 }
+
 #ifndef POLY2TRI
-static GLenum whichTess;
-static Position lastTess[2];
-static unsigned int lastTessIndex;
-static std::shared_ptr<PositionDbl> last;
+static GLenum whichTess2;
+static Position lastTess2[2];
+static unsigned int lastTessIndex2;
+static std::shared_ptr<PositionDbl> last2;
 
 static void CALLBACK
-tessBeginCB(GLenum _which)
+tessBeginCB2(GLenum _which)
 {
     //std::cout << "glBegin(" << getPrimitiveType(_which) << ");" << std::endl;
-    whichTess = _which;
-    lastTessIndex = 0;
+    whichTess2 = _which;
+    lastTessIndex2 = 0;
 }
 
 static void CALLBACK
-tessEndCB()
+tessEndCB2()
 {
 
     //std::cout << "glEnd();" << std::endl;
 }
 
 static void CALLBACK
-tessErrorCB(GLenum errorCode)
+tessErrorCB2(GLenum errorCode)
 {
    const GLubyte *errorStr;
 
@@ -197,7 +128,7 @@ tessErrorCB(GLenum errorCode)
 }
 
 static void CALLBACK
-tessVertexCB(const GLvoid *data)
+tessVertexCB2(const GLvoid *data)
 {
   // cast back to double type
     const GLdouble *ptr = (const GLdouble*)data;
@@ -209,40 +140,40 @@ tessVertexCB(const GLvoid *data)
     Color c(1.0f);
     Vector n(0.0f, 1.0f, 0.0f);
 
-    switch(whichTess) {
+    switch(whichTess2) {
     case GL_TRIANGLES :
-        pGlyph->addFillPoint(pos, c, n);
+        pGlyph2->addFillPoint(pos, c, n);
         break;
     case GL_TRIANGLE_FAN:   // to use uniform geometry convert to triangles
-        if (lastTessIndex < 2) {
-            lastTess[lastTessIndex] = pos;
-            ++lastTessIndex;
+        if (lastTessIndex2 < 2) {
+            lastTess2[lastTessIndex2] = pos;
+            ++lastTessIndex2;
         }
         else {
-            pGlyph->addFillPoint(lastTess[0], c, n);
-            pGlyph->addFillPoint(lastTess[1], c, n);
-            pGlyph->addFillPoint(pos, c, n);
+            pGlyph2->addFillPoint(lastTess2[0], c, n);
+            pGlyph2->addFillPoint(lastTess2[1], c, n);
+            pGlyph2->addFillPoint(pos, c, n);
 
             // with a fan point 0 stays
-            lastTess[1] = pos;
+            lastTess2[1] = pos;
         }
         break;
     case GL_TRIANGLE_STRIP:   // to use uniform geometry convert to triangles
-        if (lastTessIndex < 2) {
-            lastTess[lastTessIndex] = pos;
-            ++lastTessIndex;
+        if (lastTessIndex2 < 2) {
+            lastTess2[lastTessIndex2] = pos;
+            ++lastTessIndex2;
         }
         else {
-            pGlyph->addFillPoint(lastTess[0], c, n);
-            pGlyph->addFillPoint(lastTess[1], c, n);
-            pGlyph->addFillPoint(pos, c, n);
+            pGlyph2->addFillPoint(lastTess2[0], c, n);
+            pGlyph2->addFillPoint(lastTess2[1], c, n);
+            pGlyph2->addFillPoint(pos, c, n);
 
-            lastTess[0] = lastTess[1];
-            lastTess[1] = pos;
+            lastTess2[0] = lastTess2[1];
+            lastTess2[1] = pos;
         }
         break;
     default:
-        std::cerr << "Undefined " << getPrimitiveType(whichTess) << std::endl;
+        std::cerr << "Undefined " << getPrimitiveType2(whichTess2) << std::endl;
     }
 
     // DEBUG //
@@ -250,20 +181,106 @@ tessVertexCB(const GLvoid *data)
 }
 
 static void CALLBACK
-tessCombineCB(const GLdouble newVertex[3], const GLdouble *neighborVertex[4],
+tessCombineCB2(const GLdouble newVertex[3], const GLdouble *neighborVertex[4],
                             const GLfloat neighborWeight[4], GLdouble **outData)
 {
    //std::cerr << "Undefined tessCombineCB" << std::endl;
 }
 
+
+
+#endif
+
+
+namespace psc {
+namespace gl {
+
+
+class CompareByArea {
+    public:
+    bool operator()(std::shared_ptr<struct Polygon2>& a, std::shared_ptr<struct Polygon2>& b) {
+        const Rect ra = a->bounds();    // better use Bound as these will be more accurate or event all points...
+        const Rect rb = b->bounds();
+        bool gt = ra.area() > rb.area();
+        return gt;
+    }
+};
+
+Glyph2::Glyph2(gunichar _glyph, GeometryContext *geometryContext)
+: glyph{_glyph}
+, m_lineGeom{std::make_shared<Geom2>(GL_LINES, geometryContext)}
+, m_fillGeom{std::make_shared<Geom2>(GL_TRIANGLES, geometryContext)}
+, m_tex{0}
+, m_ctx{geometryContext}
+{
+}
+
+Glyph2::~Glyph2()
+{
+    if (m_tex > 0) {
+        glDeleteTextures(1, &m_tex);
+        m_tex = 0;
+    }
+}
+
+
+#ifndef DIRECT_SCAN
+
+static int
+move_to(const FT_Vector *to, Polygons *lines)
+{
+    SharedPoly next = std::make_shared<Polygon>();
+    std::shared_ptr<PositionDbl> pos = std::make_shared<PositionDbl>(*to);
+    next->positions.push_back(pos);
+    lines->push_back(next);
+
+    last2 = pos;
+    return 0;
+}
+
+static int
+line_to(const FT_Vector *to, Polygons *lines)
+{
+    std::shared_ptr<PositionDbl> pos = std::make_shared<PositionDbl>(*to);
+    SharedPoly poly = lines->back();
+    poly->positions.push_back(pos);
+
+    last2 = pos;
+    return 0;
+}
+
+static int
+conic_to( const FT_Vector *control, const FT_Vector *to, Polygons *lines)
+{
+    std::shared_ptr<PositionDbl> p0 = last2;
+    std::shared_ptr<PositionDbl> p1 = std::make_shared<PositionDbl>(*control);
+    std::shared_ptr<PositionDbl> p2 = std::make_shared<PositionDbl>(*to);
+    SharedPoly poly = lines->back();
+    poly->quadric_bezier(p0, p1, p2, BEZIER_POINTS);
+    last2 = p2;
+    return 0;
+}
+
+static int
+cubic_to( const FT_Vector *control1, const FT_Vector *control2, const FT_Vector *to, Polygons *lines)
+{
+    std::shared_ptr<PositionDbl> p0 = last2;
+    std::shared_ptr<PositionDbl> p1 = std::make_shared<PositionDbl>(*control1);
+    std::shared_ptr<PositionDbl> p2 = std::make_shared<PositionDbl>(*control2);
+    std::shared_ptr<PositionDbl> p3 = std::make_shared<PositionDbl>(*to);
+    SharedPoly poly = lines->back();
+    poly->cubic_bezier(p0, p1, p2, p3, BEZIER_POINTS);
+    last2 = p3;
+    return 0;
+}
 #endif
 
 void
-Glyph::buildLineTriangels(FT_Library library, FT_Face face, FT_UInt glyph_index)
+Glyph2::buildLineTriangels(FT_Library library, FT_Face face, FT_UInt glyph_index)
 {
-    pGlyph = this;
+    pGlyph2 = this;
     FT_Outline* outline = &face->glyph->outline;
-    p2t::Polygons polys;
+    Polygons2 polys;
     #ifdef DIRECT_SCAN
     // allows using contour info from structure
     //std::cout << std::hex << "0x" << (int)glyph << std::dec
@@ -274,7 +291,7 @@ Glyph::buildLineTriangels(FT_Library library, FT_Face face, FT_UInt glyph_index)
     for (int cont = 0; cont < outline->n_contours; ++cont) {
         int endIdx = outline->contours[cont];       // this index is inclusive
         if (endIdx - startIdx >= 2) {                // ignore those not making a shape e.g. dejavue 'u' anchor ?
-            auto poly = std::make_shared<struct p2t::Polygon>();
+            auto poly = std::make_shared<struct Polygon2>();
             poly->addPoints(outline, startIdx, endIdx, cont);
             polys.push_back(poly);
         }
@@ -313,7 +330,7 @@ Glyph::buildLineTriangels(FT_Library library, FT_Face face, FT_UInt glyph_index)
 }
 
 bool
-Glyph::extractGlyph(FT_Library library, FT_Face face, FT_UInt glyph_index, GLenum textType)
+Glyph2::extractGlyph(FT_Library library, FT_Face face, FT_UInt glyph_index, GLenum textType)
 {
 
 //  std::cout << "Glyph indx " << glyph_index << std::endl;
@@ -339,23 +356,23 @@ Glyph::extractGlyph(FT_Library library, FT_Face face, FT_UInt glyph_index, GLenu
 }
 
 void
-Glyph::displayLine(Matrix &mv)
+Glyph2::displayLine(Matrix& mv)
 {
-    if (m_lineGeom.getNumVertex() > 0) {     // allow glyphes without shape e.g. space
-        m_lineGeom.display(mv);
+    if (m_lineGeom->getNumVertex() > 0) {     // allow glyphes without shape e.g. space
+        m_lineGeom->display(mv);
     }
 }
 
 void
-Glyph::display(Matrix &mv)
+Glyph2::display(Matrix& mv)
 {
-    if (m_fillGeom.getNumVertex() > 0) {     // allow glyphes without shape e.g. space
-        m_fillGeom.display(mv);
+    if (m_fillGeom->getNumVertex() > 0) {     // allow glyphes without shape e.g. space
+        m_fillGeom->display(mv);
     }
 }
 
 GLint
-Glyph::bindTexture()
+Glyph2::bindTexture()
 {
     if (m_tex > 0) {
         glBindTexture(GL_TEXTURE_2D, m_tex);
@@ -365,7 +382,7 @@ Glyph::bindTexture()
 }
 
 void
-Glyph::render2tex(FT_Library library, FT_Face face, FT_UInt glyph_index)
+Glyph2::render2tex(FT_Library library, FT_Face face, FT_UInt glyph_index)
 {
     FT_Error err = 0;
     if (face->glyph->format != FT_GLYPH_FORMAT_BITMAP) {
@@ -387,14 +404,14 @@ Glyph::render2tex(FT_Library library, FT_Face face, FT_UInt glyph_index)
         FT_Size_Metrics fontSize = fontMetric->metrics;
         FT_GlyphSlot pglyph = face->glyph;
         FT_Bitmap bmp = pglyph->bitmap;
-        GLuint ascender = static_cast<GLfloat>(fixed2float(fontSize.ascender));
+        GLuint ascender = fixed2float(fontSize.ascender);
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wunused-variable"
-        GLfloat descender = static_cast<GLfloat>(fixed2float(fontSize.descender));
+        GLfloat descender = fixed2float(fontSize.descender);
 #pragma GCC diagnostic pop
         GLuint rows = bmp.rows;
         GLuint cols = bmp.width;
-        GLuint orows = static_cast<GLuint>(fixed2float(fontSize.height));
+        GLuint orows = fixed2float(fontSize.height);
         GLuint ocols = fontSize.y_ppem;
         //std::cout << std::hex << "0x" << (int)glyph < <std::dec
         //          << " top: " <<  pglyph->bitmap_top
@@ -449,17 +466,17 @@ Glyph::render2tex(FT_Library library, FT_Face face, FT_UInt glyph_index)
  * @return TRUE has shape, FALSE empty shape e.g space
  */
 bool
-Glyph::tesselate(p2t::Polygons outline)
+Glyph2::tesselate(Polygons2 outline)
 {
     bool ret = false;
     if (outline.size() > 0) {
-        p2t::Polygons nested;        // build nested structure with holes assigned, here only separate polys
+        Polygons2 nested;        // build nested structure with holes assigned, here only separate polys
         ret = true;
         outline.sort(CompareByArea());  // sort largest first -> must be outer
         // fine for latin, but we need something better for other languages
         while (!outline.empty()) {
             //std::cout << "Outline size " << outline.size() << std::endl;
-            p2t::SharedPoly outer = outline.front();
+            SharedPoly2 outer = outline.front();
             outline.pop_front();
             nested.push_back(outer);
             outer->nested(outline);
@@ -484,7 +501,7 @@ Glyph::tesselate(p2t::Polygons outline)
                 for (int i = 0; i < 3; ++i) {
                     p2t::Point* p = tri->GetPoint(i);
                     Position pos(p->x, p->y, 0.0);
-                    pGlyph->addFillPoint(pos, c, n);
+                    pGlyph2->addFillPoint(pos, c, n);
                 }
             }
             nest->clearTemp();
@@ -494,12 +511,12 @@ Glyph::tesselate(p2t::Polygons outline)
         GLUtesselator *tess = gluNewTess();
         gluTessNormal(tess, 0.0, 0.0, -1.0);  // our data lies in x-y plane
 
-        gluTessCallback(tess, GLU_TESS_BEGIN, (void (CALLBACK *)())tessBeginCB);
-        gluTessCallback(tess, GLU_TESS_END, (void (CALLBACK *)())tessEndCB);
-        gluTessCallback(tess, GLU_TESS_ERROR, (void (CALLBACK *)())tessErrorCB);
-        gluTessCallback(tess, GLU_TESS_VERTEX, (void (CALLBACK *)())tessVertexCB);
+        gluTessCallback(tess, GLU_TESS_BEGIN, (void (CALLBACK *)())tessBeginCB2);
+        gluTessCallback(tess, GLU_TESS_END, (void (CALLBACK *)())tessEndCB2);
+        gluTessCallback(tess, GLU_TESS_ERROR, (void (CALLBACK *)())tessErrorCB2);
+        gluTessCallback(tess, GLU_TESS_VERTEX, (void (CALLBACK *)())tessVertexCB2);
         // If your primitive is self-intersecting, you must also specify a callback to create new vertices:
-        gluTessCallback(tess, GLU_TESS_COMBINE, (void (CALLBACK *)())tessCombineCB);
+        gluTessCallback(tess, GLU_TESS_COMBINE, (void (CALLBACK *)())tessCombineCB2);
         //gluTessProperty(tess, GLU_TESS_BOUNDARY_ONLY, GL_TRUE);
         gluTessProperty(tess, GLU_TESS_WINDING_RULE, GLU_TESS_WINDING_NONZERO);
         for (auto poly : nested) {
@@ -516,13 +533,13 @@ Glyph::tesselate(p2t::Polygons outline)
 }
 
 void
-Glyph::setAdvance(GLfloat advance)
+Glyph2::setAdvance(GLfloat advance)
 {
     m_advance = advance;
 }
 
 void
-Glyph::addLine(std::shared_ptr<PositionDbl> posD, std::shared_ptr<PositionDbl> endD, Color &c, Vector *n)
+Glyph2::addLine(std::shared_ptr<PositionDbl> posD, std::shared_ptr<PositionDbl> endD, Color &c, Vector *n)
 {
     Position pos;
     pos.x = (GLfloat)posD->x;
@@ -533,31 +550,38 @@ Glyph::addLine(std::shared_ptr<PositionDbl> posD, std::shared_ptr<PositionDbl> e
     end.y = (GLfloat)endD->y;
     end.z = (GLfloat)endD->z;
 
-    m_lineGeom.addLine(pos, end, c, n);
+    m_lineGeom->addLine(pos, end, c, n);
 }
 
 void
-Glyph::addFillPoint(const Position& pos, const Color &c, const Vector &n)
+Glyph2::addFillPoint(const Position& pos, const Color &c, const Vector &n)
 {
     //std::cout <<  "addFillPoint" << glyph << " " << c.r << " " << c.g << " " << c.b << std::endl;
-    m_fillGeom.addPoint(&pos, &c, &n);
+    m_fillGeom->addPoint(&pos, &c, &n);
 }
 
 GLuint
-Glyph::getNumVertex()
+Glyph2::getNumVertex()
 {
-    return m_lineGeom.getNumVertex();
+    return m_lineGeom->getNumVertex();
 }
 
 void
-Glyph::create_vao()
+Glyph2::create_vao()
 {
     //std::cout << " 0x"
     //          << std::hex << (int)glyph << std::dec
-    //          << " fill vertexes: " << m_fillGeom.getNumVertex()
-    //          << " line vertexes: " << m_lineGeom.getNumVertex()
+    //          << " fill vertexes: " << m_fillGeom->getNumVertex()
+    //          << " line vertexes: " << m_lineGeom->getNumVertex()
     //          << std::endl;
 
-    m_lineGeom.create_vao();
-    m_fillGeom.create_vao();
+    m_lineGeom->create_vao();
+    m_fillGeom->setName(Glib::ustring::sprintf("Glyph line %c", getChar()));
+    m_fillGeom->create_vao();
+    m_fillGeom->setName(Glib::ustring::sprintf("Glyph fill %c", getChar()));
 }
+
+
+
+} /* namespace gl */
+} /* namespace psc */

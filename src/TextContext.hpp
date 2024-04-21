@@ -20,8 +20,7 @@
 #include "NaviContext.hpp"
 
 class Text;
-
-
+class Font;
 
 class TextContext : public NaviContext
 {
@@ -35,7 +34,7 @@ public:
     bool useUV() override;
     bool createProgram(Glib::Error &error);
     void setTexture(int texture);
-    // create a text with matching parameters for this 
+    // create a text with matching parameters for this
     //   "belonging" to ctx to allow rendering in a batch
     //   using this ctx for rendering
     Text *createText(NaviContext *ctx, Font *font);

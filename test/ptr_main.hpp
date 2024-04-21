@@ -1,5 +1,6 @@
+/* -*- Mode: c++; indent-tabs-mode: t; c-basic-offset: 4; tab-width: 4 -*-  */
 /*
- * Copyright (C) 2018 rpf
+ * Copyright (C) 2024 RPf <gpl3@pfeifer-syscon.de>
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -17,29 +18,37 @@
 
 #pragma once
 
-#include "GenericGlmCompat.hpp"
-#include <glm/mat4x4.hpp> // glm::mat4
 
-class Rotational {
+class Base
+{
 public:
-    Rotational(float phi = 0.0f, float theta = 180.0f, float psi = 0.0f);
-    Rotational(const Rotational& orig) = default;
-    virtual ~Rotational() = default;
+    Base(int n);
+    explicit Base(const Base& orig) = delete;
+    virtual ~Base();
 
-    void add(float phi, float theta, float psi);
-    void add(const Rotational &rot);
-    float phiRadians();
-    float thetaRadians();
-    float psiRadians();
-    static float deg2radians(float deg);
-    float getPhi();
-    float getTheta();
-    float getPsi();
-private:
-    float  phi;
-    float  theta;
-    float  psi;
+    virtual void dummy();
+    void base();
+    int get();
+protected :
+    int m_val;
 };
 
-typedef glm::mat4 Matrix;
+class Test
+: public Base
+{
+public:
+    Test(int n);
+    explicit Test(const Test& orig) = delete;
+    virtual ~Test();
 
+    void dummy() override;
+    void test();
+};
+
+class Unrelated
+{
+public:
+    Unrelated() = default;
+    explicit Unrelated(const Unrelated& orig) = delete;
+    ~Unrelated() = default;
+};

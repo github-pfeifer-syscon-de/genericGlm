@@ -133,13 +133,15 @@ NaviGlArea::on_motion_notify_event(GdkEventMotion* event)
     bool btn2 = (event->state & Gdk::ModifierType::BUTTON2_MASK) != 0;
     bool btn3 = (event->state & Gdk::ModifierType::BUTTON3_MASK) != 0;
 
-    Geometry *selected = scene->getSelected();
+    auto selected = scene->getSelected();
     if (btn3) {
-        if (selected != nullptr) {
-            Rotational r = selected->getRotation();
-            r.add((event->x - m_mouseX) / 3.0f, (event->y - m_mouseY) / 3.0f, 0.0f);    // work differently than below
-            //std::cout << "e.x " << r.getPhi() << " e.y " << r.getTheta()  << " e.z " << r.getPsi() << std::endl;
-            selected->setRotation(r);
+        if (selected) {
+            if (auto lsel = selected.lease()) {
+                Rotational r = lsel->getRotation();
+                r.add((event->x - m_mouseX) / 3.0f, (event->y - m_mouseY) / 3.0f, 0.0f);    // work differently than below
+                //std::cout << "e.x " << r.getPhi() << " e.y " << r.getTheta()  << " e.z " << r.getPsi() << std::endl;
+                lsel->setRotation(r);
+            }
         }
         else {
             m_rot.add((event->y - m_mouseY) / 3.0f, (event->x - m_mouseX) / 3.0f, 0.0f);
@@ -148,11 +150,13 @@ NaviGlArea::on_motion_notify_event(GdkEventMotion* event)
     else if (btn2) {
         float dx = -(event->x - m_mouseX) / 50.0f;
         float dy =  (event->y - m_mouseY) / 50.0f;
-        if (selected != nullptr) {
-            Position p = selected->getPos();
-            p.x -= dx;
-            p.y -= dy;
-            selected->setPosition(p);
+        if (selected) {
+            if (auto lsel = selected.lease()) {
+                Position p = lsel->getPos();
+                p.x -= dx;
+                p.y -= dy;
+                lsel->setPosition(p);
+            }
         }
         else {
             m_viewPos.x += dx;
@@ -178,11 +182,13 @@ NaviGlArea::on_motion_notify_event(GdkEventMotion* event)
 bool
 NaviGlArea::on_scroll_event(GdkEventScroll* event)
 {
-    Geometry *selected = scene->getSelected();
+    auto selected = scene->getSelected();
     if (selected) {
-        Position p = selected->getPos();
-        p.z += event->direction == GDK_SCROLL_UP ? -0.3f : 0.3f;
-        selected->setPosition(p);
+        if (auto lsel = selected.lease()) {
+            Position p = lsel->getPos();
+            p.z += event->direction == GDK_SCROLL_UP ? -0.3f : 0.3f;
+            lsel->setPosition(p);
+        }
     }
     else {
         if (!scene->scroll(event)) {

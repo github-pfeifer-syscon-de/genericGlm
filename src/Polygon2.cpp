@@ -20,14 +20,15 @@
 #include <fstream>
 
 
-#include "Polygon.hpp"
+#include "Polygon2.hpp"
 
-namespace p2t { // use namespace as somewhere windose has a Polygon defined
+namespace psc {
+namespace gl {
 
 static const int BEZIER_POINTS = 2; // as we use a relative small display size this shoud be sufficient as 5 points lead to immense amount of vertexes e.g. > 400 for a 8 ...
 
 
-Polygon::Polygon()
+Polygon2::Polygon2()
 : positions()
 , bezier()
 , bezierType{Bezier::none}
@@ -36,7 +37,7 @@ Polygon::Polygon()
 }
 
 Rect &
-Polygon::bounds()
+Polygon2::bounds()
 {
     if (positions.empty()) {
         std::cerr << "Got polygon with no positions!" << std::endl;
@@ -53,7 +54,7 @@ Polygon::bounds()
 }
 
 Bound &
-Polygon::outers()
+Polygon2::outers()
 {
     if (positions.empty()) {
         std::cerr << "Got polygon with no positions!" << std::endl;
@@ -84,7 +85,7 @@ Polygon::outers()
 
 
 void
-Polygon::quadric_bezier(SharedPos p0, SharedPos p1,
+Polygon2::quadric_bezier(SharedPos p0, SharedPos p1,
         SharedPos p2, int n)
 {
     double s = 1.0 / (double)n;
@@ -104,7 +105,7 @@ Polygon::quadric_bezier(SharedPos p0, SharedPos p1,
 }
 
 void
-Polygon::cubic_bezier(SharedPos p0, SharedPos p1, SharedPos p2, SharedPos p3, int n)
+Polygon2::cubic_bezier(SharedPos p0, SharedPos p1, SharedPos p2, SharedPos p3, int n)
 {
     double s = 1.0 / (double)n;
     double t = s;
@@ -124,7 +125,7 @@ Polygon::cubic_bezier(SharedPos p0, SharedPos p1, SharedPos p2, SharedPos p3, in
 }
 
 void
-Polygon::addPoint(int tags, SharedPos pos)
+Polygon2::addPoint(int tags, SharedPos pos)
 {
     //std::cout << std::hex << "    0x" << (tags & 0x01) << " 0x" << (tags & 0x02)
 
@@ -171,7 +172,7 @@ Polygon::addPoint(int tags, SharedPos pos)
 // check https://www.freetype.org/freetype2/docs/glyphs/glyphs-6.html if we follow all rules
 //  but latin glyphs look fine
 void
-Polygon::addPoints(FT_Outline* outline, int start, int end, int cont)
+Polygon2::addPoints(FT_Outline* outline, int start, int end, int cont)
 {
     //std::cout << "  start " << start
     //          << " end " << end
@@ -192,7 +193,7 @@ Polygon::addPoints(FT_Outline* outline, int start, int end, int cont)
 }
 
 void
-Polygon::clearTemp()
+Polygon2::clearTemp()
 {
     for (auto n : holes) {
         n->clearTemp();
@@ -201,7 +202,7 @@ Polygon::clearTemp()
 }
 
 std::vector<p2t::Point*>
-Polygon::toTess()
+Polygon2::toTess()
 {
     std::vector<p2t::Point*> polyline;
 #ifdef POLY2TRI
@@ -246,7 +247,7 @@ Polygon::toTess()
 //            <0 for P2  right of the line
 //    See: Algorithm 1 "Area of Triangles and Polygons"
 double
-Polygon::isLeft(const SharedPos& P0,const SharedPos& P1,const PositionDbl& P2 )
+Polygon2::isLeft(const SharedPos& P0,const SharedPos& P1,const PositionDbl& P2 )
 {
     return ( (P1->x - P0->x) * (P2.y - P0->y)
             - (P2.x -  P0->x) * (P1->y - P0->y) );
@@ -259,7 +260,7 @@ Polygon::isLeft(const SharedPos& P0,const SharedPos& P1,const PositionDbl& P2 )
 //      Input:   P = a point,
 //      Return:  wn = the winding number (=0 only when P is outside)
 int
-Polygon::windingNumber(const PositionDbl& P)
+Polygon2::windingNumber(const PositionDbl& P)
 {
     int wn = 0;    // the  winding number counter
     //std::cout << "windingNumber for x " << P.x << " y " << P.y << std::endl;
@@ -290,14 +291,14 @@ Polygon::windingNumber(const PositionDbl& P)
  *    otherwise use winding number optional with a limit number of points
  */
 void
-Polygon::nested(Polygons &outline)
+Polygon2::nested(Polygons2 &outline)
 {
     Rect rect = bounds();
     //std::cout << "nested " << rect.info()
     //          << std::endl;
 
     for (auto s = outline.begin(); s != outline.end(); ) {
-        SharedPoly p = *s;
+        SharedPoly2 p = *s;
         Rect inner = p->bounds();
         //std::cout << "  bound " << inner.area() << std::endl;
         Rect res;
@@ -319,7 +320,7 @@ Polygon::nested(Polygons &outline)
 }
 
 void
-Polygon::gluTess(GLUtesselator *tess)
+Polygon2::gluTess(GLUtesselator *tess)
 {
     gluTessBeginContour(tess);
     for (auto p : positions) {
@@ -333,5 +334,5 @@ Polygon::gluTess(GLUtesselator *tess)
     }
 }
 
-
-}   // namespace p2t
+}   // namespace gl
+}   // namespace psc

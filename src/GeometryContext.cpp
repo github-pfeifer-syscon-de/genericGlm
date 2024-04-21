@@ -24,6 +24,7 @@
 #include <glm/ext.hpp>
 
 #include "Geometry.hpp"
+#include "Geom2.hpp"
 #include "TextContext.hpp"
 #include "GeometryContext.hpp"
 
@@ -55,10 +56,30 @@ GeometryContext::addGeometry(Displayable *geo)
     geometries.push_back(geo);
 }
 
+void
+GeometryContext::addGeometry(const psc::gl::aptrGeom2& geo)
+{
+    for (auto& geom : geom2) {
+        if (geom == geo) {
+            return;
+        }
+    }
+    geom2.push_back(geo);
+}
+
  void
  GeometryContext::removeGeometry(Displayable *geo)
  {
      geometries.remove(geo);
+     for (auto iter = geom2.begin(); iter != geom2.end(); ) {
+         auto& geo2 = *iter;
+         if (!geo2 || geo2.get() == geo) {
+             iter = geom2.erase(iter);
+         }
+         else {
+             ++iter;
+         }
+     }
  }
 
  int
@@ -158,8 +179,20 @@ GeometryContext::useNormalMap() {
  void
  GeometryContext::setAllVisible(bool visible)
 {
-    for (auto g : geometries) {
+    for (auto& g : geometries) {
         g->setVisible(visible);
+    }
+    for (auto iter = geom2.begin(); iter != geom2.end(); ) {
+        auto& geo = *iter;
+        if (!geo) {
+            iter = geom2.erase(iter);
+        }
+        else {
+            if (auto lgeo = geo.lease()) {
+                lgeo->setVisible(visible);
+            }
+            ++iter;
+        }
     }
 }
 

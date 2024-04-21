@@ -1,5 +1,6 @@
+/* -*- Mode: c++; indent-tabs-mode: t; c-basic-offset: 4; tab-width: 4 -*-  */
 /*
- * Copyright (C) 2021 rpf
+ * Copyright (C) 2024 RPf <gpl3@pfeifer-syscon.de>
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -15,22 +16,20 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-
 #pragma once
 
-#include <cstdlib>
-#include <string>
-#include <vector>
-#include <list>
-#include "GenericGlmCompat.hpp"
 #include <memory>
-#include <GL/glu.h>
-
-
+#include <list>
 
 #include "PositionDbl.hpp"
 
-namespace p2t { // use namespace as somewhere windose has a Polygon defined
+namespace p2t {
+class Point;
+}
+
+namespace psc {
+namespace gl {
+
 
 enum class Bezier {
     none,
@@ -38,26 +37,25 @@ enum class Bezier {
     cubic
 };
 
-struct Polygon;
-typedef std::shared_ptr<Polygon> SharedPoly;
-typedef std::list<SharedPoly> Polygons;
+struct Polygon2;
+typedef std::shared_ptr<Polygon2> SharedPoly2;
+typedef std::list<SharedPoly2> Polygons2;
 
-class Point;
 
-struct Polygon {
+struct Polygon2 {
     Positions positions;
     std::vector<SharedPos> bezier;
     Bezier bezierType;
     SharedPos last;
-    std::vector<std::shared_ptr<Polygon>> holes;
+    std::vector<SharedPoly2> holes;
     Rect bound;
     Bound outer;
-    std::vector<std::shared_ptr<Point>> posTemp;
-    Polygon();
+    std::vector<std::shared_ptr<p2t::Point>> posTemp;
+    Polygon2();
 
 
-    std::vector<Point*> toTess();
-    void nested(Polygons &outline);
+    std::vector<p2t::Point*> toTess();
+    void nested(Polygons2 &outline);
     double isLeft(const SharedPos& P0, const SharedPos& P1, const PositionDbl& P2);
     int windingNumber(const PositionDbl& P);
     Bound& outers();
@@ -71,4 +69,5 @@ struct Polygon {
     void clearTemp();
 };
 
-}   // namespace p2t
+}   // namespace gl
+}   // namespace psc

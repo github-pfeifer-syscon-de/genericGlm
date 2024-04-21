@@ -38,13 +38,6 @@ PositionDbl::PositionDbl(const FT_Vector& vect)
 {
 }
 
-PositionDbl::PositionDbl(const PositionDbl& o)
-: x{o.x}
-, y{o.y}
-, z{o.z}
-{
-}
-
 PositionDbl::PositionDbl(double _x, double _y, double _z)
 : x{_x}
 , y{_y}

@@ -24,7 +24,9 @@
 
 typedef class MarkContext MarkContext;
 
-class NaviContext : public ShaderContext {
+class NaviContext
+: public ShaderContext
+{
 public:
     NaviContext();
     virtual ~NaviContext();
@@ -35,10 +37,14 @@ public:
     Geometry *createGeometry(GLenum type);
     void display(const Matrix &perspectiveView);
     void display(const Matrix &perspectiveView, std::list<Displayable *> &geometries);
+    void display(const Matrix &perspectiveView, std::list<psc::gl::aptrGeom2> &geom2);
+
     Geometry *hit(float x, float y);
+    psc::gl::aptrGeom2 hit2(float x, float y);
 protected:
     virtual void updateLocation() override;
     Displayable *hit(float x, float y, std::list<Displayable *> &chldGeos);
+    psc::gl::aptrGeom2 hit2(float x, float y, std::list<psc::gl::aptrGeom2>& list);
 
 private:
     GLint m_mvp_location;

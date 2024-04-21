@@ -42,7 +42,7 @@ struct PositionDbl
     GLdouble y;
     GLdouble z;
     PositionDbl();
-    PositionDbl(const PositionDbl& o);
+    PositionDbl(const PositionDbl& o) = default;
     PositionDbl(const FT_Vector& vect);
     PositionDbl(double _x, double _y, double _z);
     bool operator==(const PositionDbl& o);

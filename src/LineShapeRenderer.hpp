@@ -36,10 +36,10 @@ public:
     double getDistIncrement() override {
         return shapeStep;
     }
-    const double getShapeForwardGap() {
+    double getShapeForwardGap() {
         return shapeGap;
     }
-    const double getShapeSideGap() {
+    double getShapeSideGap() {
         return shapeGap / 3.0;
     }
 
