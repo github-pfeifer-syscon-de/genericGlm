@@ -275,11 +275,11 @@ static /*constexpr*/ bool active_debug{false};
         {
             if (m_active_ctl
              && m_active_ctl->is_unreferenced()) {
-                if (active_debug) {
-                std::cout << "active_lease::removeControlIfUnsued delete "
-                          << (*this)
-                          << std::endl;
-                }
+                //if (active_debug) {
+                //std::cout << "active_lease::removeControlIfUnsued delete "
+                //          << (*this)
+                //          << std::endl;
+                //}
                 delete m_active_ctl;
                 m_active_ctl = nullptr;
             }
@@ -336,6 +336,7 @@ static /*constexpr*/ bool active_debug{false};
                       << (*this)
                       << std::endl;
             }
+            sp.m_active_ctl = nullptr;
         }
 
         // conversion
@@ -421,6 +422,22 @@ static /*constexpr*/ bool active_debug{false};
             return m_active_ctl == sp.m_active_ctl;
         }
 
+        // name reset would have been more clear
+        void resetThis()
+        {
+            if (m_active_ctl) {
+                if (m_active_ctl->is_active()) {
+                    std::lock_guard<std::mutex> lock(m_active_ctl->get_mutex());
+                    m_active_ctl->dec_use();
+                }
+                else {  // if inactive no locking required ...
+                    m_active_ctl->dec_use();
+                }
+            }
+            removeControlIfUnsued();
+        }
+
+        // name resetAll would have been more clear
         void reset()
         {
             if (m_active_ctl) {
@@ -470,10 +487,11 @@ static /*constexpr*/ bool active_debug{false};
 
         void removeControlIfUnsued()
         {
-            if (active_debug) {
-            std::cout << "active_ptr::removeControlIfUnsued"
-                      << std::endl;
-            }
+            //if (active_debug) {
+            //std::cout << "active_ptr::removeControlIfUnsued"
+            //          << (*this)
+            //          << std::endl;
+            //}
             if (m_active_ctl
              && m_active_ctl->is_unreferenced()) {
                 delete m_active_ctl;

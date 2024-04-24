@@ -17,7 +17,9 @@
  */
 
 #include <iostream>
+#include <deque>
 #include <source_location>
+#include <ConcurrentCollections.hpp>
 
 std::ostream&
 operator<< (std::ostream& os, const std::source_location& location)
@@ -314,6 +316,35 @@ creationTest()
 }
 
 static bool
+collectionTest()
+{
+    baseFreed = 0;
+    testFreed = 0;
+    std::cout << "collection -----------" << std::endl;
+    if (true) {     // as we run into trouble with this test this as well
+        TQueueConcurrent<psc::mem::active_ptr<Base>> thumbnailReaderQueue;
+        auto entry = psc::mem::make_active<Test>(99);
+        std::cout << "collcc emplace_back --------" << std::endl;
+        thumbnailReaderQueue.emplace_back(entry);
+        std::cout << "collcc pop_front -----" << std::endl;
+        auto front = thumbnailReaderQueue.pop_front();
+        std::cout << "collcc poped_front -----" << std::endl;
+        if (!front) {
+            return false;
+        }
+        if (auto lfront = front.lease()) {
+            std::cout << "val " << lfront->get() << std::endl;
+        }
+    }
+    std::cout << "collection ---------- "
+              << " base " << baseFreed
+              << " test " << testFreed
+              << std::endl;
+
+    return baseFreed == 0 && testFreed == 0;
+}
+
+static bool
 livespanTest()
 {
     baseFreed = 0;
@@ -378,6 +409,9 @@ main(int argc, char** argv) {
         return 1;
     }
     if (!creationTest()) {
+        return 1;
+    }
+    if (!collectionTest()) {
         return 1;
     }
 
