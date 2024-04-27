@@ -241,7 +241,7 @@ Scene::createMark()
                 lmark->addIndex(7, 3);
                 lmark->addIndex(4, 7);   // left
                 lmark->create_vao();
-                std::cout << "creating vao mark " << mark << std::endl;
+                //std::cout << "creating vao mark " << mark << std::endl;
             }
         }
     }
