@@ -295,9 +295,9 @@ NaviGlArea::on_realize()
     scene->init(this);
 
     glClearDepthf(1.0f);
-    checkError("clear depth");
+    psc::gl::checkError("clear depth");
     glClearColor(0.1, 0.1, 0.15, 1.0);  // has no meaning rendering will be done by fb
-    checkError("clear color");
+    psc::gl::checkError("clear color");
     update_timer();
 }
 
@@ -328,11 +328,11 @@ NaviGlArea::on_render(const Glib::RefPtr<Gdk::GLContext> &context)
     make_current();
     /* draw our object */
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-    checkError("clear");
+    psc::gl::checkError("clear");
 
     if (m_fbctx != nullptr) {
         m_fbctx->prepare();        // move this out of repaint ... sometimes, but need to keep it in updates
-        checkError("renderBuf prep");
+        psc::gl::checkError("renderBuf prep");
     }
 #ifdef DEBUG
     if (m_glTimer == 0) {
@@ -354,24 +354,24 @@ NaviGlArea::on_render(const Glib::RefPtr<Gdk::GLContext> &context)
 #endif
     scene->draw(this, m_projection, m_view);
     scene->showMark(this, m_projection, m_view); // do this after as we need calculated transform
-    checkError("renderBuf draw");
+    psc::gl::checkError("renderBuf draw");
 #ifdef DEBUG
     glEndQuery(GL_TIME_ELAPSED);
 #endif
     if (m_fbctx != nullptr) {
         m_fbctx->done();
-        checkError("renderBuf done");
+        psc::gl::checkError("renderBuf done");
         glFlush();
         attach_buffers();       // this is the game changer to get output !!!
 
         glViewport(0, 0, get_width(), get_height());    // need to keep updating !!! as viewport changes ...
-        checkError("view viewport");
+        psc::gl::checkError("view viewport");
 
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-        checkError("clear");
+        psc::gl::checkError("clear");
 
         m_fbctx->draw();
-        checkError("renderBuf draw");
+        psc::gl::checkError("renderBuf draw");
     }
     glFlush();  /* flush the contents of the pipeline, shoud be mostly harmless */
     return FALSE;

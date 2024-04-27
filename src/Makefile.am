@@ -35,13 +35,9 @@ libgenericglm_la_LDFLAGS = \
 libgenericglm_la_SOURCES = \
 	BaseDialog.cpp \
 	FbShaderContext.cpp \
-	Font.cpp \
 	Displayable.cpp \
-	Geometry.cpp \
 	GeometryContext.cpp \
 	glarea-error.c \
-	Glyph.cpp \
-	Polygon.cpp \
 	PositionDbl.cpp \
 	MarkContext.cpp \
 	Matrix.cpp \
@@ -49,21 +45,8 @@ libgenericglm_la_SOURCES = \
 	NaviGlArea.cpp \
 	Scene.cpp \
 	ShaderContext.cpp \
-	SunDiscGeometry.cpp \
-	SunDiscRenderer.cpp \
-	Text.cpp \
 	TextContext.cpp \
-	TreeGeometry.cpp \
-	TreeNode.cpp \
-	TreeRenderer.cpp \
-	FallShapeGeometry.cpp \
-	FallShapeRenderer.cpp \
-	LineShapeGeometry.cpp \
-	LineShapeRenderer.cpp \
-	TextTreeGeometry.cpp \
 	Buffer.cpp \
-	Diagram.cpp \
-	NamedTreeNode.cpp \
 	active_ptr.cpp \
 	Geom2.cpp \
 	Diagram2.cpp \
@@ -98,13 +81,9 @@ pkginclude_HEADERS = \
 	BaseDialog.hpp \
 	GenericGlmCompat.hpp \
 	FbShaderContext.hpp \
-	Font.hpp \
 	Displayable.hpp \
-	Geometry.hpp \
 	GeometryContext.hpp \
 	glarea-error.h \
-	Glyph.hpp \
-	Polygon.hpp \
 	PositionDbl.hpp \
 	MarkContext.hpp \
 	Matrix.hpp \
@@ -112,21 +91,8 @@ pkginclude_HEADERS = \
 	NaviGlArea.hpp \
 	Scene.hpp \
 	ShaderContext.hpp \
-	SunDiscGeometry.hpp \
-	SunDiscRenderer.hpp \
-	Text.hpp \
 	TextContext.hpp \
-	TreeGeometry.hpp \
-	TreeNode.hpp \
-	TreeRenderer.hpp \
-	FallShapeGeometry.hpp \
-	FallShapeRenderer.hpp \
-	LineShapeGeometry.hpp \
-	LineShapeRenderer.hpp \
-	TextTreeGeometry.hpp \
 	Buffer.hpp \
-	Diagram.hpp \
-	NamedTreeNode.hpp \
 	active_ptr.hpp \
 	Geom2.hpp \
 	Diagram2.hpp \

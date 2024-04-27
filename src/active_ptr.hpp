@@ -437,8 +437,7 @@ static /*constexpr*/ bool active_debug{false};
             removeControlIfUnsued();
         }
 
-        // name resetAll would have been more clear
-        void reset()
+        void resetAll()
         {
             if (m_active_ctl) {
                 std::lock_guard<std::mutex> lock(m_active_ctl->get_mutex());

@@ -159,7 +159,7 @@ Scene::unrealizeMark()
     //    delete m_mark;
     //    m_mark = nullptr;
     //}
-    m_mark.reset();
+    m_mark.resetAll();
     if (m_markContext != nullptr) {
         delete m_markContext;
     }

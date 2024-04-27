@@ -56,7 +56,6 @@ Geom2::Geom2(GLenum type, GeometryContext *_ctx)
 , geometries()
 , m_master{nullptr}
 , m_type{type}
-, debugGeom{nullptr}
 , m_sensitivity{0.0f}
 , m_min{999.0f}
 , m_max{-999.0f}
@@ -77,50 +76,6 @@ Geom2::~Geom2()
     // if we get here there should be no need for further actions as this should be unreachable by now
     //remove();
     geometries.clear(); // make errors more obvious
-    deleteVertexArray();
-}
-
-// consider this as deprecated
-void
-Geom2::remove()
-{
-    // probably prefer active_ptr::reset
-    // the structures for geometries was simplified:
-    //   - belonging to a geometry (to allow modifications additional reference from model)
-    if (m_master) {
-        //std::cout << "remove " << std::hex << this << " from master " << std::hex << m_master << std::endl;
-        m_master->removeGeometry(this);
-    }
-    else {
-      if (m_ctx && m_removeFromctx) {
-          //std::cout << "remove " << std::hex << this << " from ctx " << std::hex << m_ctx << std::endl;
-          m_ctx->removeGeometry(this);
-      }
-    }
-    //std::cout << "remove " << std::hex << this << " size " << geometries.size() << " remove " << (m_removeChildren ? "y" : "n") << std::endl;
-    int n = 0;
-    for (auto p = geometries.begin(); p != geometries.end(); ++n) {
-        auto& chld = *p;
-        //std::cout << "loop " << std::hex << this << " remove " << std::hex << chld << " pos " << n << std::endl;
-        {
-            auto lchld = chld.lease();
-            if (lchld) {
-                lchld->resetMaster();  // prevent iterator hassles, by preventing inner remove from list
-            }
-        }
-        if (m_removeChildren) {
-            chld.reset();
-        }
-        p = geometries.erase(p);
-    }
-    geometries.clear();
-    //std::cout << "remove " << std::hex << this << " destr lsnr " << destructionListeners.size() << std::endl;
-    //for (auto p = destructionListeners.begin(); p != destructionListeners.end(); ++p) {
-    //    GeometryDestructionListener *lsnr = *p;
-    //    lsnr->geometryDestroyed(this);
-    //}
-    //destructionListeners.clear();
-    //std::cout << "remove " << std::hex << this << " delete vertex arr " << std::endl;
     deleteVertexArray();
 }
 
@@ -661,19 +616,21 @@ Geom2::addSphere(float radius, unsigned int rings, unsigned int sectors)
             Vector tangent{tSinLon[s] * sinLat, y, tCosLon[s] * sinLat};
             Vector bitangent{sinLon[s] * btSinLat, btSinLat2, cosLon[s] * btSinLat};
             addPoint(&position, nullptr, &normal, &uv, &tangent, &bitangent);
-            if (debugGeom != nullptr) {
+            if (m_debugGeom) {
                 // debug vectors
-                Color red(1.0f, 0.0f, 0.0f);
-                Vector nm(0.0f, 1.0f, 0.0f);
-                Position p0 = position * 1.1f;
-                Position p1 = p0 + normal;
-                debugGeom->addLine(p0, p1, red, &nm);
-                Color gn(0.0f, 1.0f, 0.0f);
-                Position t = p0 + tangent;
-                debugGeom->addLine(p0, t, gn, &nm);
-                Color bl(0.0f, 0.0f, 1.0f);
-                Position b = p0 + bitangent;
-                debugGeom->addLine(p0, b, bl, &nm);
+                if (auto ldebugGeom = m_debugGeom.lease()) {
+                    Color red(1.0f, 0.0f, 0.0f);
+                    Vector nm(0.0f, 1.0f, 0.0f);
+                    Position p0 = position * 1.1f;
+                    Position p1 = p0 + normal;
+                    ldebugGeom->addLine(p0, p1, red, &nm);
+                    Color gn(0.0f, 1.0f, 0.0f);
+                    Position t = p0 + tangent;
+                    ldebugGeom->addLine(p0, t, gn, &nm);
+                    Color bl(0.0f, 0.0f, 1.0f);
+                    Position b = p0 + bitangent;
+                    ldebugGeom->addLine(p0, b, bl, &nm);
+                }
             }
         }
     }
@@ -693,8 +650,10 @@ Geom2::addSphere(float radius, unsigned int rings, unsigned int sectors)
             m_indexes.push_back(i0);
         }
     }
-    if (debugGeom != nullptr) {
-        debugGeom->create_vao();
+    if (m_debugGeom) {
+        if (auto ldebugGeom = m_debugGeom.lease()) {
+            ldebugGeom->create_vao();
+        }
     }
 }
 
@@ -758,9 +717,9 @@ Geom2::addSphere(float radius, unsigned int rings, unsigned int sectors)
 
 
 void
-Geom2::setDebugGeometry(Geom2* geo)
+Geom2::setDebugGeometry(const aptrGeom2& geo)
 {
-    debugGeom = geo;
+    m_debugGeom = geo;
 }
 /*
  * get the transform for geometry that includes all parent transforms.

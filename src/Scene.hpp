@@ -24,7 +24,7 @@
 #include "NaviContext.hpp"
 #include "MarkContext.hpp"
 
-class Scene 
+class Scene
 {
 public:
     Scene();
@@ -58,7 +58,6 @@ public:
     virtual bool scroll(GdkEventScroll* event);
 protected:
 
-    Geometry *createMark(MarkContext *markContext);
     MarkContext *m_markContext;
     psc::gl::aptrGeom2 m_mark;
     psc::gl::aptrGeom2 m_selected;

@@ -19,9 +19,6 @@
 
 #include "FbShaderContext.hpp"
 #include "glarea-error.h"
-#include "Geometry.hpp"
-
-void checkError(const char*);
 
 #undef FB_DEBUG
 
@@ -37,7 +34,7 @@ Framebuffer::Framebuffer()
 , fbSampling{1}
 {
     glGenFramebuffers(1, &m_framebufferId);
-    checkError("TexShaderCtx glGenFramebuffers");
+    psc::gl::checkError("TexShaderCtx glGenFramebuffers");
 }
 
 Framebuffer::~Framebuffer()
@@ -68,7 +65,7 @@ void
 Framebuffer::bind()
 {
     glBindFramebuffer(GL_FRAMEBUFFER, m_framebufferId);
-    checkError("TexShaderCtx glBindFramebuffer");
+    psc::gl::checkError("TexShaderCtx glBindFramebuffer");
 }
 
 void
@@ -80,14 +77,14 @@ Framebuffer::unbind()
 	#else
     glBindFramebuffer(GL_FRAMEBUFFER, 0);
 	#endif
-    checkError("TexShaderCtx glBindFramebuffer 0");
+    psc::gl::checkError("TexShaderCtx glBindFramebuffer 0");
 }
 
 void
 Framebuffer::bindTexture()
 {
     glBindTexture(GL_TEXTURE_2D, m_textureId);
-    checkError("TexShaderCtx glBindTexture");
+    psc::gl::checkError("TexShaderCtx glBindTexture");
 }
 
 GLuint
@@ -122,16 +119,16 @@ Framebuffer::scale(GLuint width, GLuint height, GLint _sampling, bool depth)
     fbSampling = _sampling;
     freeBuffer();
     glBindFramebuffer(GL_FRAMEBUFFER, m_framebufferId);
-    checkError("TexShaderCtx glBindFramebuffer");
+    psc::gl::checkError("TexShaderCtx glBindFramebuffer");
     //RGBA8 2D texture, 24 bit depth texture
     glGenTextures(1, &m_textureId);
-    checkError("TexShaderCtx glGenTextures"); // gets an error but everything seems ok
+    psc::gl::checkError("TexShaderCtx glGenTextures"); // gets an error but everything seems ok
     glBindTexture(GL_TEXTURE_2D, m_textureId);
-    checkError("TexShaderCtx glBindTexture");
+    psc::gl::checkError("TexShaderCtx glBindTexture");
     //nullptr means reserve texture memory, but texels are undefined
     // this leads to a warning as we pass nullptr, the doc says this should be allowed ...
     glTexImage2D(GL_TEXTURE_2D, 0, atype, fbWidth, fbHeight, 0, type, format, nullptr);
-    checkError("TexShaderCtx glTexImage2D");
+    psc::gl::checkError("TexShaderCtx glTexImage2D");
     #ifndef USE_GLES
     GLint maxSamples{-1};
     // we need to find out what the maximum supported samples is
@@ -144,22 +141,22 @@ Framebuffer::scale(GLuint width, GLuint height, GLint _sampling, bool depth)
         glTexImage2DMultisample(GL_TEXTURE_2D_MULTISAMPLE, useSampling, GL_RGBA, fbWidth, fbHeight, GL_TRUE);
     }
     #endif
-    checkError("TexShaderCtx glTexImage2DMultisample");
+    psc::gl::checkError("TexShaderCtx glTexImage2DMultisample");
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);   // linear shoud give optimal result, weightened to effort
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
-    checkError("TexShaderCtx glTexParameteri");
+    psc::gl::checkError("TexShaderCtx glTexParameteri");
     if (depth) {
         // The depth buffer
         glGenRenderbuffers(1, &m_depthbufId);
-        checkError("TexShaderCtx glGenRenderbuffers");
+        psc::gl::checkError("TexShaderCtx glGenRenderbuffers");
         glBindRenderbuffer(GL_RENDERBUFFER, m_depthbufId);
-        checkError("TexShaderCtx glBindRenderbuffer");
+        psc::gl::checkError("TexShaderCtx glBindRenderbuffer");
         glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH_COMPONENT, fbWidth, fbHeight);
-        checkError("TexShaderCtx glRenderbufferStorage");
+        psc::gl::checkError("TexShaderCtx glRenderbufferStorage");
         glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_RENDERBUFFER, m_depthbufId);
-        checkError("TexShaderCtx glFramebufferRenderbuffer");
+        psc::gl::checkError("TexShaderCtx glFramebufferRenderbuffer");
     }
     // Set "renderedTexture" as our colour attachement #0
 	#ifndef USE_GLES
@@ -167,11 +164,11 @@ Framebuffer::scale(GLuint width, GLuint height, GLint _sampling, bool depth)
 	#else
     glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, m_textureId, 0);
 	#endif
-    checkError("TexShaderCtx glFramebufferTexture");
+    psc::gl::checkError("TexShaderCtx glFramebufferTexture");
     // Set the list of draw buffers.
     GLenum DrawBuffers[1] = {GL_COLOR_ATTACHMENT0};
     glDrawBuffers(1, DrawBuffers); // "1" is the size of DrawBuffers
-    checkError("TexShaderCtx glDrawBuffers");
+    psc::gl::checkError("TexShaderCtx glDrawBuffers");
 
     //-------------------------
     //Does the GPU support current FBO configuration?
@@ -196,24 +193,15 @@ FbShaderContext::FbShaderContext()
 : ShaderContext()
 , winWidth{0}
 , winHeight{0}
-, m_box{nullptr}
 , m_texLocation{0}
 , m_clear_color{0.1, 0.1, 0.15}
 {
 }
 
-FbShaderContext::~FbShaderContext()
-{
-    if (m_box != nullptr) {
-        delete m_box;
-        m_box = nullptr;
-    }
-}
-
 void
 FbShaderContext::updateLocation() {
     m_texLocation = glGetUniformLocation(m_program, "renderedTexture");
-    checkError("TexShaderCtx unif");
+    psc::gl::checkError("TexShaderCtx unif");
 }
 
 bool
@@ -251,8 +239,8 @@ FbShaderContext::setup(unsigned int _width, unsigned int _height, unsigned int s
         m_renderBuffer->scale(_width * sampling, _height * sampling, 1, true);
         //m_resolveBuffer->scale(_width, _height, sampling, false);
     }
-    if (m_box == nullptr) {
-        m_box = new Geometry(GL_TRIANGLES, this);
+    if (!m_box) {
+        m_box = psc::mem::make_active<psc::gl::Geom2>(GL_TRIANGLES, this);
 
         //             x      y     z                u     v
         Position p0(-1.0f, -1.0f, 0.0f);    UV uv0(0.0f, 0.0f);
@@ -261,13 +249,15 @@ FbShaderContext::setup(unsigned int _width, unsigned int _height, unsigned int s
         Position p3(-1.0f,  1.0f, 0.0f);    UV uv3(0.0f, 1.0f);
         Position p4( 1.0f, -1.0f, 0.0f);    UV uv4(1.0f, 0.0f);
         Position p5( 1.0f,  1.0f, 0.0f);    UV uv5(1.0f, 1.0f);
-        m_box->addPoint(&p0, nullptr, nullptr, &uv0);
-        m_box->addPoint(&p1, nullptr, nullptr, &uv1);
-        m_box->addPoint(&p2, nullptr, nullptr, &uv2);
-        m_box->addPoint(&p3, nullptr, nullptr, &uv3);
-        m_box->addPoint(&p4, nullptr, nullptr, &uv4);
-        m_box->addPoint(&p5, nullptr, nullptr, &uv5);
-        m_box->create_vao();
+        if (auto lbox = m_box.lease()) {
+            lbox->addPoint(&p0, nullptr, nullptr, &uv0);
+            lbox->addPoint(&p1, nullptr, nullptr, &uv1);
+            lbox->addPoint(&p2, nullptr, nullptr, &uv2);
+            lbox->addPoint(&p3, nullptr, nullptr, &uv3);
+            lbox->addPoint(&p4, nullptr, nullptr, &uv4);
+            lbox->addPoint(&p5, nullptr, nullptr, &uv5);
+            lbox->create_vao();
+        }
     }
 }
 
@@ -285,14 +275,14 @@ FbShaderContext::prepare() {
     if (m_renderBuffer ) {
         m_renderBuffer->bind();
         glViewport(0, 0, m_renderBuffer->getWidth(), m_renderBuffer->getHeight());
-        checkError("TexShaderCtx glViewport");
+        psc::gl::checkError("TexShaderCtx glViewport");
     }
     glClearDepthf(1.0f);
-    checkError("clear depth");
+    psc::gl::checkError("clear depth");
     glClearColor(m_clear_color.r, m_clear_color.g, m_clear_color.b, 1.0);
-    checkError("TexShaderCtx clearColor");
+    psc::gl::checkError("TexShaderCtx clearColor");
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-    checkError("TexShaderCtx clear");
+    psc::gl::checkError("TexShaderCtx clear");
 }
 
 // back to normal rendering
@@ -327,7 +317,7 @@ FbShaderContext::draw() {
     use();
     // Bind our texture in Texture Unit 0
     glActiveTexture(GL_TEXTURE0);
-    checkError("TexShaderCtx glActiveTexture");
+    psc::gl::checkError("TexShaderCtx glActiveTexture");
     //if (m_resolveBuffer) {
     //    m_resolveBuffer->bindTexture();
     //}
@@ -336,11 +326,13 @@ FbShaderContext::draw() {
     }
     // Set our "renderedTexture" sampler to use Texture Unit 0
     glUniform1i(m_texLocation, 0);      // texture unit 0 see above
-    checkError("TexShaderCtx glUniform1i texID");
+    psc::gl::checkError("TexShaderCtx glUniform1i texID");
     Matrix mvp(1.0f);       // use default matrix, as this will not get used
-    m_box->display(mvp);
+    if (auto lbox = m_box.lease()) {
+        lbox->display(mvp);
+    }
 
-    checkError("TexShaderCtx fbCtx display");
+    psc::gl::checkError("TexShaderCtx fbCtx display");
     unuse();
 }
 

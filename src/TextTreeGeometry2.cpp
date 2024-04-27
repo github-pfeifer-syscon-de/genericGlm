@@ -54,8 +54,9 @@ TextTreeGeometry2::createText(const std::shared_ptr<TreeNode2>& treeNode, NaviCo
 }
 
 void
-TextTreeGeometry2::removeText() {
-    m_text.reset();
+TextTreeGeometry2::removeText()
+{
+    m_text.resetAll();
 }
 
 

@@ -37,7 +37,7 @@ NamedTreeNode2::~NamedTreeNode2()
 {
     //std::cout << std::scouce_location::current() << m_name << std::endl;
     // order matters cleanup bottom to top!
-    m_geo.reset();      // clear from other collections as well
+    m_geo.resetAll();      // clear from other collections as well
     m_children.clear();
     //if (m_geo) {
     //    delete m_geo;   // will remove from depended (parent) as well
@@ -103,7 +103,7 @@ NamedTreeNode2::createLineDown(NaviContext *shaderContext, float y)
 {
     if (m_children.size() == 0) {
         if (m_lineDown) {
-            m_lineDown.reset();
+            m_lineDown.resetAll();
             m_lastY = 0.0f;
         }
     }
@@ -111,7 +111,7 @@ NamedTreeNode2::createLineDown(NaviContext *shaderContext, float y)
         if (!m_lineDown
           ||m_lastY != y)  {
             if (m_lineDown) {
-                m_lineDown.reset();
+                m_lineDown.resetAll();
             }
             m_lineDown = psc::mem::make_active<Geom2>(GL_LINES, shaderContext);
             auto llineDown = m_lineDown.lease();

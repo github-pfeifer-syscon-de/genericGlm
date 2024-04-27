@@ -22,6 +22,7 @@
 
 #include "GenericGlmCompat.hpp"
 #include "ShaderContext.hpp"
+#include "Geom2.hpp"
 
 class Framebuffer {
 public:
@@ -52,7 +53,7 @@ class FbShaderContext
 public:
     FbShaderContext();
 
-    virtual ~FbShaderContext();
+    virtual ~FbShaderContext() = default;
     void setup(unsigned int width, unsigned int height, unsigned int sampling);
     void updateLocation() override;
     void prepare();
@@ -73,7 +74,7 @@ private:
     // tried to improve antialiasing with separate buffer
     //   but using the first buffer with a larger size seems sufficient
     //std::shared_ptr<Framebuffer> m_resolveBuffer;
-    Geometry *m_box;
+    psc::gl::aptrGeom2 m_box;
 
     GLuint m_texLocation;
     Color m_clear_color;

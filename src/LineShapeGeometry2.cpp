@@ -45,7 +45,7 @@ LineShapeGeometry2::update(Position& start, double width, double size, const std
 
 LineShapeGeometry2::~LineShapeGeometry2()
 {
-    m_line.reset();
+    m_line.resetAll();
 }
 
 void

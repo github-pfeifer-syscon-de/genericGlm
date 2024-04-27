@@ -26,7 +26,6 @@
 #include "Matrix.hpp"
 #include "Displayable.hpp"
 
-class Geometry;
 
 class ShaderContext
 : public GeometryContext
@@ -35,7 +34,7 @@ public:
     ShaderContext();
     virtual ~ShaderContext();
 
-    unsigned int getProgram() {
+    GLuint getProgram() {
         return m_program;
     }
     void use() {
@@ -52,7 +51,7 @@ public:
     virtual Matrix setScalePos(const Matrix &m, Position &p, GLfloat scale) = 0;
 protected:
     virtual void updateLocation() = 0;
-    unsigned int m_program;
+    GLuint m_program;
 private:
 
 };

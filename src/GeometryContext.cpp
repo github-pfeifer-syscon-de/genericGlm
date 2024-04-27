@@ -23,10 +23,8 @@
 #include <glm/vec4.hpp> // vec4
 #include <glm/ext.hpp>
 
-#include "Geometry.hpp"
-#include "Geom2.hpp"
-#include "TextContext.hpp"
 #include "GeometryContext.hpp"
+#include "Displayable.hpp"
 
 GeometryContext::GeometryContext()
 : m_position_index{0}
@@ -35,26 +33,9 @@ GeometryContext::GeometryContext()
 , m_uv_index{0}
 , m_normMapTangentIndex{0}
 , m_normMapBitangentIndex{0}
-, m_text_context{nullptr}
  {
  }
 
-GeometryContext::~GeometryContext()
-{
-    for (auto geo : geometries) {
-        geo->setContext(nullptr);  // let any geometry forget about this context
-                                //   as when destructing happens in a slightly illogic way
-                                //     we dont want to try a remove that crashes
-    }
-    geometries.clear();
-}
-
-void
-GeometryContext::addGeometry(Displayable *geo)
-{
-    geo->setRemoveFromCtx(true);
-    geometries.push_back(geo);
-}
 
 void
 GeometryContext::addGeometry(const psc::gl::aptrGeom2& geo)
@@ -70,7 +51,6 @@ GeometryContext::addGeometry(const psc::gl::aptrGeom2& geo)
  void
  GeometryContext::removeGeometry(Displayable *geo)
  {
-     geometries.remove(geo);
      for (auto iter = geom2.begin(); iter != geom2.end(); ) {
          auto& geo2 = *iter;
          if (!geo2 || geo2.get() == geo) {
@@ -179,9 +159,6 @@ GeometryContext::useNormalMap() {
  void
  GeometryContext::setAllVisible(bool visible)
 {
-    for (auto& g : geometries) {
-        g->setVisible(visible);
-    }
     for (auto iter = geom2.begin(); iter != geom2.end(); ) {
         auto& geo = *iter;
         if (!geo) {
@@ -194,13 +171,5 @@ GeometryContext::useNormalMap() {
             ++iter;
         }
     }
-}
-
-GeometryDestructionListener::GeometryDestructionListener()
-{
-}
-
-GeometryDestructionListener::~GeometryDestructionListener()
-{
 }
 

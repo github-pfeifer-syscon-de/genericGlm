@@ -18,7 +18,6 @@
 
 #include <gtkmm.h>
 
-#include "Geometry.hpp"
 #include "Matrix.hpp"
 #include "Scene.hpp"
 #include "FbShaderContext.hpp"

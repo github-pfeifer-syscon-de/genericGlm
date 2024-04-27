@@ -18,9 +18,8 @@
 #pragma once
 
 #include "NaviContext.hpp"
-
-class Text;
-class Font;
+#include "Text2.hpp"
+#include "Font2.hpp"
 
 class TextContext : public NaviContext
 {
@@ -37,7 +36,7 @@ public:
     // create a text with matching parameters for this
     //   "belonging" to ctx to allow rendering in a batch
     //   using this ctx for rendering
-    Text *createText(NaviContext *ctx, Font *font);
+    psc::gl::aptrText2 createText(NaviContext *ctx, const psc::gl::ptrFont2& font);
 protected:
     void updateLocation() override;
 

@@ -16,15 +16,11 @@
  */
 #include <iostream>
 #include <sstream>
-
 #include <glibmm.h>
+#include <cmath>
 
 #include "GenericGlmCompat.hpp"
-
-#include <math.h>
-
 #include "glarea-error.h"
-
 #include "ShaderContext.hpp"
 
 void GLAPIENTRY

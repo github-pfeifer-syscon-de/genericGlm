@@ -22,12 +22,10 @@
 
 #include "TreeNode2.hpp"
 #include "Geom2.hpp"
-
-
+#include "TextContext.hpp"
 
 namespace psc {
 namespace gl {
-
 
 
 class TreeNode;

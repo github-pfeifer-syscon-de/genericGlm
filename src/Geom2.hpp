@@ -30,9 +30,10 @@
 #include <StringUtils.hpp>
 
 #include "active_ptr.hpp"
-#include "GeometryContext.hpp"
 #include "Displayable.hpp"
-#include "NaviContext.hpp"
+
+class NaviContext;
+class GeometryContext;
 
 namespace psc {
 namespace gl {
@@ -96,7 +97,7 @@ public:
     void removeGeometry(Geom2* geo);
     std::list<Displayable *> &getGeometries();
     std::list<aptrGeom2>& getGeom2();
-    void setDebugGeometry(Geom2* geo);
+    void setDebugGeometry(const aptrGeom2& geo);
     void resetMaster() override;
     void setRemoveChildren(bool removeChildren);
     bool isRemoveChildren();
@@ -106,12 +107,11 @@ public:
     //void removeDestructionListener(GeometryDestructionListener *listener);
     void deleteVertexArray();
 protected:
-    void remove();
     std::list<aptrGeom2> geometries;
     std::list<Displayable *> m_legacyGeometries;
     Geom2 *m_master;
     GLenum m_type;
-    Geom2 *debugGeom;
+    aptrGeom2 m_debugGeom;
     float m_sensitivity;
     Position m_min,m_max;
     Position v_min,v_max;

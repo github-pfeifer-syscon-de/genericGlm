@@ -31,7 +31,7 @@ TreeNode2::TreeNode2()
 
 TreeNode2::~TreeNode2()
 {
-    m_treeGeometry.reset();
+    m_treeGeometry.resetAll();
     m_children.clear();
 }
 
@@ -125,7 +125,7 @@ TreeNode2::setTreeGeometry(const psc::mem::active_ptr<TreeGeometry2>& _treeGeome
 void
 TreeNode2::removeGeometry()
 {
-    m_treeGeometry.reset();
+    m_treeGeometry.resetAll();
 }
 
 

@@ -19,7 +19,6 @@
 
 #include "NaviContext.hpp"
 #include "TextContext.hpp"
-#include "Text.hpp"
 
 TextContext::TextContext(GLenum type)
 : m_type{type}
@@ -135,10 +134,12 @@ TextContext::createProgram(Glib::Error &error)
     return ret;
 }
 
-Text *
-TextContext::createText(NaviContext *ctx, Font *font)
+psc::gl::aptrText2
+TextContext::createText(NaviContext *ctx, const psc::gl::ptrFont2& font)
 {
-    Text *text = new Text(m_type, ctx, font);
-    text->setTextContext(this);
+    auto text = psc::mem::make_active<psc::gl::Text2>(m_type, ctx, font);
+    if (auto ltext = text.lease()) {
+        ltext->setTextContext(this);
+    }
     return text;
 }

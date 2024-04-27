@@ -166,7 +166,7 @@ ptrTest()
                         if (lease1) {
                             std::cout << "test2 get " << lease1 << std::endl;
                             lease1->test();
-                            test2.reset();
+                            test2.resetAll();
                             lease1->test();
                         }
                         else {
@@ -372,7 +372,7 @@ livespanTest()
               << " adr " << std::hex << base.get() << std::dec
               << std::endl;
     // use 1 state active adr 0x5ea83084a360
-    base.reset();
+    base.resetAll();
     // active_ctl::reset dealloc addr 0x5ea83084a360 use 1 lease 0
     // ptr_main.cpp(75:47) virtual Test::~Test(); n 7
     // ptr_main.cpp(49:47) virtual Base::~Base(); val 0

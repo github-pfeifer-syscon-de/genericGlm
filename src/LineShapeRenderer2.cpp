@@ -22,7 +22,6 @@
 
 #include "LineShapeRenderer2.hpp"
 #include "LineShapeGeometry2.hpp"
-#include "TextContext.hpp"
 
 namespace psc {
 namespace gl {

@@ -17,10 +17,9 @@
 
 #include <glm/ext/matrix_transform.hpp>
 
+#include "Geom2.hpp"
 #include "NaviContext.hpp"
 #include "MarkContext.hpp"
-#include "Geometry.hpp"
-#include "Geom2.hpp"
 
 NaviContext::NaviContext()
 : m_mvp_location{0}
@@ -30,16 +29,14 @@ NaviContext::NaviContext()
 
 NaviContext::~NaviContext()
 {
-    // as references are need anyway to update most objects its left to
-    //   the views to destruct geometries
-    geometries.clear();
+
 }
 
 void
 NaviContext::updateLocation()
 {
     m_mvp_location = glGetUniformLocation(m_program, "mvp");
-    checkError("glGetUniformLocation ");
+    psc::gl::checkError("glGetUniformLocation ");
 }
 
 Matrix
@@ -64,13 +61,13 @@ void
 NaviContext::setMvp(glm::mat4 &mvp)
 {
     glUniformMatrix4fv(m_mvp_location, 1, GL_FALSE, &mvp[0][0]);
-    checkError("glUniformMatrix4fv (mvp)");
+    psc::gl::checkError("glUniformMatrix4fv (mvp)");
 }
 
-Geometry *
+psc::gl::aptrGeom2
 NaviContext::createGeometry(GLenum type)
 {
-    Geometry *geo = new Geometry(type, this);
+    auto geo = psc::mem::make_active<psc::gl::Geom2>(type, this);
     addGeometry(geo);
     return geo;
 }
@@ -78,21 +75,8 @@ NaviContext::createGeometry(GLenum type)
 void
 NaviContext::display(const Matrix &perspectiveView)
 {
-    display(perspectiveView, geometries);
-    checkError("display geometries");
     display(perspectiveView, geom2);
-    checkError("display geometries");
-}
-
-void
-NaviContext::display(const Matrix &perspectiveView, std::list<Displayable *> &geometries)
-{
-    for (auto g : geometries) {
-        glm::mat4 mvp = setModel(perspectiveView, g->getTransform());
-        g->display(perspectiveView);
-        g->updateClickBounds(mvp);
-        display(mvp, g->getGeometries());
-    }
+    psc::gl::checkError("display geometries");
 }
 
 void
@@ -113,17 +97,6 @@ NaviContext::display(const Matrix &perspectiveView, std::list<psc::gl::aptrGeom2
             iter = geom2.erase(iter);
         }
     }
-}
-
-Geometry *
-NaviContext::hit(float x, float y)
-{
-    auto next_selected = hit(x, y, geometries);
-    auto geo = dynamic_cast<Geometry*>(next_selected);
-    //if (next_selected != nullptr) {
-    //    std::cout << "Selected " << typeid(*next_selected).name() << std::endl;
-    //}
-    return geo;
 }
 
 psc::gl::aptrGeom2

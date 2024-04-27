@@ -34,12 +34,10 @@ public:
     Matrix setScalePos(const Matrix &perspectiveView, Position &p, GLfloat scale) override;
     Matrix setModel(const Matrix &perspectiveView, Matrix &model);
     void setMvp(glm::mat4 &mvp);
-    Geometry *createGeometry(GLenum type);
+    psc::gl::aptrGeom2 createGeometry(GLenum type);
     void display(const Matrix &perspectiveView);
-    void display(const Matrix &perspectiveView, std::list<Displayable *> &geometries);
     void display(const Matrix &perspectiveView, std::list<psc::gl::aptrGeom2> &geom2);
 
-    Geometry *hit(float x, float y);
     psc::gl::aptrGeom2 hit2(float x, float y);
 protected:
     virtual void updateLocation() override;
