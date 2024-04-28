@@ -18,29 +18,28 @@
 
 #pragma once
 
-#include <glib-2.0/glib.h>
+#include <cstdint>
 #include <memory>
-
 
 template<class T>
 class Buffer
 {
 public:
-    Buffer(guint _size);
+    Buffer(uint32_t _size);
     Buffer(const Buffer& orig);
-    virtual ~Buffer();
+    virtual ~Buffer() = default;
 
     void roll();
     void set(T _value);
     void add(const std::shared_ptr<Buffer<T>> &values);
-    void set(guint idx, T _value);
+    void set(uint32_t idx, T _value);
     T sum();
     void refreshSum();
-    T get(guint idx) const;
+    T get(uint32_t idx) const;
     T getMax() const;
     void reset();
 private:
-    guint m_size;
-    T *m_data;
+    uint32_t m_size;
+    std::unique_ptr<T[]> m_data;
     T m_sum;
 };

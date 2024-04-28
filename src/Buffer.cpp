@@ -18,74 +18,74 @@
 
 
 #include "Buffer.hpp"
+//#include <algorithm> if we getting std::copy to work
+//#include <iterator>
 
 template<class T>
-Buffer<T>::Buffer(guint _size)
+Buffer<T>::Buffer(uint32_t _size)
 : m_size{_size}
-, m_data{nullptr}
+, m_data{std::make_unique<T[]>(_size)}
 , m_sum{0}
 {
-    m_data = new T[m_size];
 	reset();
 }
 
 template<class T>
 Buffer<T>::Buffer(const Buffer& orig)
-: m_size(orig.m_size)
-, m_data(nullptr)
-, m_sum(orig.m_sum)
+: m_size{orig.m_size}
+, m_data{std::make_unique<T[]>(orig.m_size)}
+, m_sum{orig.m_sum}
 {
-    m_data = new T[m_size];
-    for (guint i = 0; i < m_size; ++i) {
+    // unsure how get this working
+    //std::copy(std::begin(orig.m_data), std::end(orig.m_data), std::begin(m_data));
+    for (auto i = 0u; i < m_size; ++i) {
         m_data[i] = orig.m_data[i];
     }
 }
 
-template<class T>
-Buffer<T>::~Buffer()
-{
-    if (m_data != nullptr) {
-        delete[] m_data;
-        m_data = nullptr;
-    }
-}
 
 template<class T> void
-Buffer<T>::set(T _value) {
+Buffer<T>::set(T _value)
+{
     set(m_size-1, _value);
 	m_sum += _value;	// account for added value
 }
 
 template<class T> void
-Buffer<T>::add(const std::shared_ptr<Buffer<T>> &_values) {
+Buffer<T>::add(const std::shared_ptr<Buffer<T>> &_values)
+{
     m_sum = 0;
-    for (guint i = 0; i < m_size; ++i) {
+    for (auto i = 0u; i < m_size; ++i) {
         m_data[i] += _values->get(i);
 		m_sum += m_data[i];
     }
 }
 
 template<class T> void
-Buffer<T>::set(guint idx, T _value) {
-    if (m_data != nullptr && idx < m_size) {
+Buffer<T>::set(uint32_t idx, T _value)
+{
+    if (idx < m_size) {
         m_data[idx] = _value;
     }
 }
 
 template<class T> T
-Buffer<T>::get(guint idx) const {
-    if (idx < m_size && m_data != nullptr) {
+Buffer<T>::get(uint32_t idx) const
+{
+    if (idx < m_size) {
         return m_data[idx];
     }
     return 0;
 }
 
 template<class T> T
-Buffer<T>::getMax() const {
+Buffer<T>::getMax() const
+{
     T max = 1;
-    for (guint i = 0; i < m_size; i++) {
-        if (max < get(i))
+    for (auto i = 0u; i < m_size; i++) {
+        if (max < get(i)) {
             max = get(i);
+        }
     }
     return max;
 }
@@ -93,12 +93,11 @@ Buffer<T>::getMax() const {
 template<class T> void
 Buffer<T>::roll()
 {
-    if (m_data != nullptr) {
-        m_sum -= m_data[0];
-        for (guint i = 0; i < m_size - 1; ++i)
-            m_data[i] = m_data[i + 1];
-         m_data[m_size - 1] = 0;        // if we wont get updates use 0
+    m_sum -= m_data[0];
+    for (auto i = 0u; i < (m_size - 1); ++i) {
+        m_data[i] = m_data[i + 1];
     }
+    m_data[m_size - 1] = 0;        // if we wont get updates use 0
 }
 
 template<class T> T
@@ -117,20 +116,19 @@ template<class T> void
 Buffer<T>::refreshSum()
 {
     m_sum = 0;
-    if (m_data != nullptr) {
-        for (guint i = 0; i < m_size; ++i)
-            m_sum += m_data[i];
+    for (auto i = 0u; i < m_size; ++i) {
+        m_sum += m_data[i];
     }
 }
 
 template<class T> void
 Buffer<T>::reset()
 {
-    for (guint i = 0; i < m_size; ++i) {
+    for (auto i = 0u; i < m_size; ++i) {
         m_data[i] = 0;
     }
 	m_sum = 0;
 }
 
 template class Buffer<double>;
-template class Buffer<guint64>;
+template class Buffer<uint64_t>;
