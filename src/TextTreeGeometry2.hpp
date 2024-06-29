@@ -28,14 +28,13 @@
 namespace psc {
 namespace gl {
 
-
-
+class TreeNode2;
 
 class TextTreeGeometry2
 : public TreeGeometry2
 {
 public:
-    TextTreeGeometry2(const std::shared_ptr<Font2>& font, GeometryContext *_ctx);
+    TextTreeGeometry2(const std::shared_ptr<Font2>& font, GeometryContext *_ctx, const std::shared_ptr<TreeNode2>& treeNode);
     virtual ~TextTreeGeometry2() = default;
 
     Position &getTreePos() {

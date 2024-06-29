@@ -32,7 +32,7 @@ class FallShapeGeometry2
 : public TextTreeGeometry2
 {
 public:
-    FallShapeGeometry2(const psc::gl::ptrFont2& font, GeometryContext *_ctx);
+    FallShapeGeometry2(const psc::gl::ptrFont2& font, GeometryContext *_ctx, const std::shared_ptr<TreeNode2>& treeNode);
     virtual ~FallShapeGeometry2() = default;
 
     void create(const std::shared_ptr<TreeNode2>& node, FallShapeRenderer2 &_renderer);

@@ -26,8 +26,8 @@ namespace psc {
 namespace gl {
 
 
-LineShapeGeometry2::LineShapeGeometry2(const ptrFont2& font, GeometryContext *_ctx)
-: TextTreeGeometry2::TextTreeGeometry2(font, _ctx)
+LineShapeGeometry2::LineShapeGeometry2(const ptrFont2& font, GeometryContext *_ctx, const std::shared_ptr<TreeNode2>& treeNode)
+: TextTreeGeometry2::TextTreeGeometry2(font, _ctx, treeNode)
 {
     setName("LineShapeGeometry2");
 }
@@ -135,6 +135,7 @@ LineShapeGeometry2::create(const std::shared_ptr<TreeNode2>& node, LineShapeRend
                 if (auto lline = m_line.lease()) {
                     lline->deleteVertexArray();
                     lline->setMarkable(false);
+                    lline->setName("treeLine");
                     lline->addLine(pl0, pl1, c0, &nt);
                     lline->addLine(pl1, pl2, c0, &nt);
                     lline->addLine(pl2, pl3, c0, &nt);

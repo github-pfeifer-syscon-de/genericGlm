@@ -71,7 +71,7 @@ SunDiscRenderer2::createSunDisc(
 {
     auto parentNode = node->getParent();
     bool toUpdate = false;
-    auto tempGeo = psc::mem::make_active<SunDiscGeometry2>(font, _ctx);
+    auto tempGeo = psc::mem::make_active<SunDiscGeometry2>(font, _ctx, node);
     auto nodeGeo = psc::mem::dynamic_pointer_cast<SunDiscGeometry2>(node->getTreeGeometry());
     if (!nodeGeo) {
         toUpdate = true;

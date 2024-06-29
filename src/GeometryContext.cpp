@@ -18,7 +18,6 @@
 
 #include <glib.h>
 #include <iostream>
-#include <math.h>
 #include <cmath>
 #include <glm/vec4.hpp> // vec4
 #include <glm/ext.hpp>

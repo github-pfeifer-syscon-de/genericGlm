@@ -210,17 +210,17 @@ Glyph2::Glyph2(gunichar _glyph, GeometryContext *geometryContext)
 : glyph{_glyph}
 , m_lineGeom{std::make_shared<Geom2>(GL_LINES, geometryContext)}
 , m_fillGeom{std::make_shared<Geom2>(GL_TRIANGLES, geometryContext)}
-, m_tex{0}
+//, m_tex{0}
 , m_ctx{geometryContext}
 {
 }
 
 Glyph2::~Glyph2()
 {
-    if (m_tex > 0) {
-        glDeleteTextures(1, &m_tex);
-        m_tex = 0;
-    }
+    //if (m_tex > 0) {
+    //    glDeleteTextures(1, &m_tex);
+    //    m_tex = 0;
+    //}
 }
 
 
@@ -345,12 +345,13 @@ Glyph2::extractGlyph(FT_Library library, FT_Face face, FT_UInt glyph_index, GLen
     if (textType == GL_TRIANGLES) {
         buildLineTriangels(library, face, glyph_index);
     }
-    else if (textType == GL_QUADS) {
-        render2tex(library, face, glyph_index);
-    }
+//    else if (textType == GL_QUADS) {
+//        render2tex(library, face, glyph_index);
+//    }
     else {  // in case of unknown build all
         std::cout << __FILE__ << "::extractGlyph unknown build " << textType
                   << " " << glyph_index << std::endl;
+        return false;
     }
     return true;                // allow also glyphs without shape e.g. space
 }
@@ -371,93 +372,93 @@ Glyph2::display(Matrix& mv)
     }
 }
 
-GLint
-Glyph2::bindTexture()
-{
-    if (m_tex > 0) {
-        glBindTexture(GL_TEXTURE_2D, m_tex);
-        checkError("TexShaderCtx glBindTextures");
-    }
-    return m_tex;
-}
-
-void
-Glyph2::render2tex(FT_Library library, FT_Face face, FT_UInt glyph_index)
-{
-    FT_Error err = 0;
-    if (face->glyph->format != FT_GLYPH_FORMAT_BITMAP) {
-        //face->glyph->bitmap_top = face->glyph->metrics->vertAdvance;
-        //face->glyph->bitmap_left = 0;
-        err = FT_Render_Glyph(face->glyph,   /* glyph slot  */
-                              FT_RENDER_MODE_NORMAL); /* render mode 256 gray levels */
-    }
-    if (err) {
-        std::cerr << "No render 0x" << std::hex << (int)glyph << std::dec << std::endl;
-    }
-    else {
-        glGenTextures(1, &m_tex);
-        checkError("TexShaderCtx glGenTextures");
-        glBindTexture(GL_TEXTURE_2D, m_tex);
-        checkError("TexShaderCtx glBindTextures");
-
-        FT_Size fontMetric = face->size;
-        FT_Size_Metrics fontSize = fontMetric->metrics;
-        FT_GlyphSlot pglyph = face->glyph;
-        FT_Bitmap bmp = pglyph->bitmap;
-        GLuint ascender = fixed2float(fontSize.ascender);
-#pragma GCC diagnostic push
-#pragma GCC diagnostic ignored "-Wunused-variable"
-        GLfloat descender = fixed2float(fontSize.descender);
-#pragma GCC diagnostic pop
-        GLuint rows = bmp.rows;
-        GLuint cols = bmp.width;
-        GLuint orows = fixed2float(fontSize.height);
-        GLuint ocols = fontSize.y_ppem;
-        //std::cout << std::hex << "0x" << (int)glyph < <std::dec
-        //          << " top: " <<  pglyph->bitmap_top
-        //          << " left: " << pglyph->bitmap_left
-        //          << " orows: " << orows << " ocols: " << ocols
-        //          << " masc: " << asc << " mdesc: " << desc
-        //          << std::endl;
-        GLuint osize = orows * ocols;
-        auto colors{new GLuint[osize]};
-        if (colors) {
-            memset(colors, 0, osize * sizeof(GLuint));
-            for (GLuint row = 0; row < rows; ++row) {
-                GLuint rowoffs = row * cols;
-                GLuint orowoffs = (ascender - pglyph->bitmap_top + row) * ocols;
-                for (GLuint col = 0; col < cols; ++col) {
-                    GLuint idx = rowoffs + col;
-                    GLuint oidx = orowoffs + (col + pglyph->bitmap_left);
-                    unsigned char val = pglyph->bitmap.buffer[idx];
-                    //std::cout << std::hex << std::setfill('0') << std::setw(2) << (val & 0xff) ;
-                    unsigned int c = 0x0;
-                    if (val > 0) {
-                        c = 0xffffff00;
-                    }
-                    colors[oidx] = g_htonl( c | (val & 0xff) );  //  htobe32 Graphics card works in bigendian, replaced gtypes for interop
-                }
-                //std::cout << std::dec << std::endl;
-            }
-            glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA
-                    , ocols, orows, 0, GL_RGBA
-                    , GL_UNSIGNED_BYTE, colors);
-            checkError("glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA");
-            glGenerateMipmap(GL_TEXTURE_2D);    // required !
-            checkError("glGenerateMipmap(GL_TEXTURE_2D)");
-
-            // Setting these min/mag parameters is important, otherwise the result will be all black !!!
-            glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);   // linear shoud give optimal result, weightened to effort
-            glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
-            //glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
-            //glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
-            checkError("TexShaderCtx glTexParameteri");
-
-            delete[] colors;
-        }
-        glBindTexture(GL_TEXTURE_2D, 0);
-    }
-}
+//GLint
+//Glyph2::bindTexture()
+//{
+//    if (m_tex > 0) {
+//        glBindTexture(GL_TEXTURE_2D, m_tex);
+//        checkError("TexShaderCtx glBindTextures");
+//    }
+//    return m_tex;
+//}
+//
+//void
+//Glyph2::render2tex(FT_Library library, FT_Face face, FT_UInt glyph_index)
+//{
+//    FT_Error err = 0;
+//    if (face->glyph->format != FT_GLYPH_FORMAT_BITMAP) {
+//        //face->glyph->bitmap_top = face->glyph->metrics->vertAdvance;
+//        //face->glyph->bitmap_left = 0;
+//        err = FT_Render_Glyph(face->glyph,   /* glyph slot  */
+//                              FT_RENDER_MODE_NORMAL); /* render mode 256 gray levels */
+//    }
+//    if (err) {
+//        std::cerr << "No render 0x" << std::hex << (int)glyph << std::dec << std::endl;
+//    }
+//    else {
+//        glGenTextures(1, &m_tex);
+//        checkError("TexShaderCtx glGenTextures");
+//        glBindTexture(GL_TEXTURE_2D, m_tex);
+//        checkError("TexShaderCtx glBindTextures");
+//
+//        FT_Size fontMetric = face->size;
+//        FT_Size_Metrics fontSize = fontMetric->metrics;
+//        FT_GlyphSlot pglyph = face->glyph;
+//        FT_Bitmap bmp = pglyph->bitmap;
+//        GLuint ascender = fixed2float(fontSize.ascender);
+//#pragma GCC diagnostic push
+//#pragma GCC diagnostic ignored "-Wunused-variable"
+//        GLfloat descender = fixed2float(fontSize.descender);
+//#pragma GCC diagnostic pop
+//        GLuint rows = bmp.rows;
+//        GLuint cols = bmp.width;
+//        GLuint orows = fixed2float(fontSize.height);
+//        GLuint ocols = fontSize.y_ppem;
+//        //std::cout << std::hex << "0x" << (int)glyph < <std::dec
+//        //          << " top: " <<  pglyph->bitmap_top
+//        //          << " left: " << pglyph->bitmap_left
+//        //          << " orows: " << orows << " ocols: " << ocols
+//        //          << " masc: " << asc << " mdesc: " << desc
+//        //          << std::endl;
+//        GLuint osize = orows * ocols;
+//        auto colors{new GLuint[osize]};
+//        if (colors) {
+//            memset(colors, 0, osize * sizeof(GLuint));
+//            for (GLuint row = 0; row < rows; ++row) {
+//                GLuint rowoffs = row * cols;
+//                GLuint orowoffs = (ascender - pglyph->bitmap_top + row) * ocols;
+//                for (GLuint col = 0; col < cols; ++col) {
+//                    GLuint idx = rowoffs + col;
+//                    GLuint oidx = orowoffs + (col + pglyph->bitmap_left);
+//                    unsigned char val = pglyph->bitmap.buffer[idx];
+//                    //std::cout << std::hex << std::setfill('0') << std::setw(2) << (val & 0xff) ;
+//                    unsigned int c = 0x0;
+//                    if (val > 0) {
+//                        c = 0xffffff00;
+//                    }
+//                    colors[oidx] = g_htonl( c | (val & 0xff) );  //  htobe32 Graphics card works in bigendian, replaced gtypes for interop
+//                }
+//                //std::cout << std::dec << std::endl;
+//            }
+//            glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA
+//                    , ocols, orows, 0, GL_RGBA
+//                    , GL_UNSIGNED_BYTE, colors);
+//            checkError("glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA");
+//            glGenerateMipmap(GL_TEXTURE_2D);    // required !
+//            checkError("glGenerateMipmap(GL_TEXTURE_2D)");
+//
+//            // Setting these min/mag parameters is important, otherwise the result will be all black !!!
+//            glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);   // linear shoud give optimal result, weightened to effort
+//            glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
+//            //glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+//            //glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+//            checkError("TexShaderCtx glTexParameteri");
+//
+//            delete[] colors;
+//        }
+//        glBindTexture(GL_TEXTURE_2D, 0);
+//    }
+//}
 
 /**
  *

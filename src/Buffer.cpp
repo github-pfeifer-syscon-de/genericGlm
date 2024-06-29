@@ -23,39 +23,35 @@
 
 template<class T>
 Buffer<T>::Buffer(uint32_t _size)
-: m_size{_size}
-, m_data{std::make_unique<T[]>(_size)}
-, m_sum{0}
+: m_data(_size, static_cast<T>(0))
+, m_sum{static_cast<T>(0)}
 {
-	reset();
 }
 
 template<class T>
 Buffer<T>::Buffer(const Buffer& orig)
-: m_size{orig.m_size}
-, m_data{std::make_unique<T[]>(orig.m_size)}
+: m_data(orig.m_data.size())
 , m_sum{orig.m_sum}
 {
-    // unsure how get this working
-    //std::copy(std::begin(orig.m_data), std::end(orig.m_data), std::begin(m_data));
-    for (auto i = 0u; i < m_size; ++i) {
-        m_data[i] = orig.m_data[i];
-    }
+    std::copy(orig.m_data.begin(), orig.m_data.end(), m_data.begin());
+    //for (auto i = 0u; i < m_size; ++i) {
+    //    m_data[i] = orig.m_data[i];
+    //}
 }
 
 
 template<class T> void
 Buffer<T>::set(T _value)
 {
-    set(m_size-1, _value);
+    set(m_data.size()-1, _value);
 	m_sum += _value;	// account for added value
 }
 
 template<class T> void
 Buffer<T>::add(const std::shared_ptr<Buffer<T>> &_values)
 {
-    m_sum = 0;
-    for (auto i = 0u; i < m_size; ++i) {
+    m_sum = static_cast<T>(0);
+    for (auto i = 0u; i < m_data.size(); ++i) {
         m_data[i] += _values->get(i);
 		m_sum += m_data[i];
     }
@@ -64,7 +60,7 @@ Buffer<T>::add(const std::shared_ptr<Buffer<T>> &_values)
 template<class T> void
 Buffer<T>::set(uint32_t idx, T _value)
 {
-    if (idx < m_size) {
+    if (idx < m_data.size()) {
         m_data[idx] = _value;
     }
 }
@@ -72,17 +68,17 @@ Buffer<T>::set(uint32_t idx, T _value)
 template<class T> T
 Buffer<T>::get(uint32_t idx) const
 {
-    if (idx < m_size) {
+    if (idx < m_data.size()) {
         return m_data[idx];
     }
-    return 0;
+    return static_cast<T>(0);
 }
 
 template<class T> T
 Buffer<T>::getMax() const
 {
     T max = 1;
-    for (auto i = 0u; i < m_size; i++) {
+    for (auto i = 0u; i < m_data.size(); i++) {
         if (max < get(i)) {
             max = get(i);
         }
@@ -94,10 +90,11 @@ template<class T> void
 Buffer<T>::roll()
 {
     m_sum -= m_data[0];
-    for (auto i = 0u; i < (m_size - 1); ++i) {
+    // std::move is a bit unclear about overlapping area
+    for (auto i = 0u; i < (m_data.size() - 1); ++i) {
         m_data[i] = m_data[i + 1];
     }
-    m_data[m_size - 1] = 0;        // if we wont get updates use 0
+    m_data[m_data.size() - 1] = static_cast<T>(0);        // if we wont get updates use 0
 }
 
 template<class T> T
@@ -115,8 +112,8 @@ Buffer<T>::sum()
 template<class T> void
 Buffer<T>::refreshSum()
 {
-    m_sum = 0;
-    for (auto i = 0u; i < m_size; ++i) {
+    m_sum = static_cast<T>(0);
+    for (auto i = 0u; i < m_data.size(); ++i) {
         m_sum += m_data[i];
     }
 }
@@ -124,10 +121,11 @@ Buffer<T>::refreshSum()
 template<class T> void
 Buffer<T>::reset()
 {
-    for (auto i = 0u; i < m_size; ++i) {
-        m_data[i] = 0;
-    }
-	m_sum = 0;
+    //for (auto i = 0u; i < m_data.size(); ++i) {
+    //    m_data[i] = 0;
+    //}
+    std::fill(m_data.begin(), m_data.end(), static_cast<T>(0));
+	m_sum = static_cast<T>(0);
 }
 
 template class Buffer<double>;

@@ -20,6 +20,8 @@
 #include <deque>
 #include <source_location>
 #include <ConcurrentCollections.hpp>
+#include <algorithm> //if we getting std::copy to work
+#include <iterator>
 
 std::ostream&
 operator<< (std::ostream& os, const std::source_location& location)
@@ -107,6 +109,43 @@ funct(const psc::mem::active_ptr<Base>& base2) noexcept
     else {
         std::cout << "funct base no access"  << std::endl;
     }
+}
+
+static bool
+copy_test()
+{
+    std::cout << "copy --------------" << std::endl;
+    auto const _size = 10u;
+    auto data{std::make_unique<uint32_t[]>(_size)};
+    auto dest{std::make_unique<uint32_t[]>(_size)};
+    for (auto i = 0u; i < _size; ++i) {
+        data[i] = i+1;
+    }
+    auto start = data.get();   //std::dynamic_pointer_cast<int>
+    auto end = start+_size;
+    auto ddest = dest.get();
+    // unsure how get this working
+    std::copy(start, end, ddest);
+    for (auto i = 0u; i < _size; ++i) {
+        uint32_t exp = i+1;
+        if (dest[i] != exp) {
+            std::cout << "Failed copy dest " << i << " exp " << exp << " is " << dest[i] << std::endl;
+            return false;
+        }
+    }
+    std::copy(data.get()+1, end, data.get());
+    for (auto i = 0u; i < _size; ++i) {
+        uint32_t exp = i+1;
+        if (i < _size-1) {
+            exp += 1;
+        }
+        if (data[i] != exp) {
+            std::cout << "Failed copy same " << i << " exp " << exp << " is " << data[i] << std::endl;
+            return false;
+        }
+    }
+    std::cout << "copy --------------" << std::endl;
+    return true;
 }
 
 static bool
@@ -412,6 +451,9 @@ main(int argc, char** argv) {
         return 1;
     }
     if (!collectionTest()) {
+        return 1;
+    }
+    if (!copy_test()) {
         return 1;
     }
 

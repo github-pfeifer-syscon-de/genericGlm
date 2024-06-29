@@ -99,12 +99,8 @@ public:
     std::list<aptrGeom2>& getGeom2();
     void setDebugGeometry(const aptrGeom2& geo);
     void resetMaster() override;
-    void setRemoveChildren(bool removeChildren);
-    bool isRemoveChildren();
     virtual void setVisible(bool visible) override;
     void setSensitivity(float sensitivity);
-    //void addDestructionListener(GeometryDestructionListener *listener);
-    //void removeDestructionListener(GeometryDestructionListener *listener);
     void deleteVertexArray();
 protected:
     std::list<aptrGeom2> geometries;
@@ -115,8 +111,6 @@ protected:
     float m_sensitivity;
     Position m_min,m_max;
     Position v_min,v_max;
-    //std::list<GeometryDestructionListener *> destructionListeners;
-    bool m_removeChildren;
     Glib::ustring m_name;
 private:
     unsigned int m_vao;

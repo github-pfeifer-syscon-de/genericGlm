@@ -27,11 +27,17 @@ namespace gl {
 
 
 
-TreeGeometry2::TreeGeometry2(GLenum type, GeometryContext *ct)
+TreeGeometry2::TreeGeometry2(GLenum type, GeometryContext *ct, const std::shared_ptr<TreeNode2>& treeNode)
 : Geom2::Geom2(type, ct)
+, m_treeNode{treeNode}
 {
 }
 
+std::weak_ptr<TreeNode2>
+TreeGeometry2::getTreeNode()
+{
+    return m_treeNode;
+}
 
 
 

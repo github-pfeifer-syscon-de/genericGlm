@@ -25,10 +25,10 @@ namespace gl {
 
 
 
-FallShapeGeometry2::FallShapeGeometry2(const psc::gl::ptrFont2& font, GeometryContext *_ctx)
-: TextTreeGeometry2::TextTreeGeometry2(font, _ctx)
+FallShapeGeometry2::FallShapeGeometry2(const psc::gl::ptrFont2& font, GeometryContext *_ctx, const std::shared_ptr<TreeNode2>& treeNode)
+: TextTreeGeometry2::TextTreeGeometry2(font, _ctx, treeNode)
 {
-    setRemoveChildren(false);   // as we keep track of children in our structure (and need them to keep transform) do not delete them
+    setName("FallShapeGeometry2");
 }
 
 void

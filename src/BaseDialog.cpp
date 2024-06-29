@@ -23,10 +23,6 @@ BaseDialog::BaseDialog(const char *name)
 {
 }
 
-BaseDialog::~BaseDialog()
-{
-}
-
 void
 BaseDialog::add_widget2box(Gtk::Box *dest, const char *lbl, Gtk::Widget *toAdd, gfloat y_scale)
 {

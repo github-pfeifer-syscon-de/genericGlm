@@ -59,7 +59,6 @@ Geom2::Geom2(GLenum type, GeometryContext *_ctx)
 , m_sensitivity{0.0f}
 , m_min{999.0f}
 , m_max{-999.0f}
-, m_removeChildren{true}
 , m_vao{0}
 , m_vertexes()
 , m_indexes()
@@ -95,18 +94,6 @@ Geom2::resetMaster()
 {
     //std::cout << "resetMaster " << std::hex << this << std::endl;
     m_master = nullptr;
-}
-
-void
-Geom2::setRemoveChildren(bool removeChildren)
-{
-    m_removeChildren = removeChildren;
-}
-
-bool
-Geom2::isRemoveChildren()
-{
-    return m_removeChildren;
 }
 
 void
@@ -888,18 +875,6 @@ Geom2::setSensitivity(float sensitivity)
 {
     m_sensitivity =  sensitivity;
 }
-
-//void
-//Geom2::addDestructionListener(GeometryDestructionListener *listener)
-//{
-//    destructionListeners.push_back(listener);
-//}
-
-//void
-//Geom2::removeDestructionListener(GeometryDestructionListener *listener)
-//{
-//    destructionListeners.remove(listener);
-//}
 
 Position &
 Geom2::getViewMin()

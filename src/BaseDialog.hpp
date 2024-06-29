@@ -22,7 +22,7 @@
 class BaseDialog : public Gtk::Dialog {
 public:
     BaseDialog(const char *title);
-    virtual ~BaseDialog();
+    virtual ~BaseDialog() = default;
 protected:
     void add_widget2box(Gtk::Box *dest, const char *lbl, Gtk::Widget *toAdd, gfloat y_scale);
 

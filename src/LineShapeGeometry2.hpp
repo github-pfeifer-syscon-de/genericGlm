@@ -32,7 +32,7 @@ namespace gl {
 class LineShapeGeometry2
 : public TextTreeGeometry2 {
 public:
-    LineShapeGeometry2(const ptrFont2& font, GeometryContext *_ctx);
+    LineShapeGeometry2(const ptrFont2& font, GeometryContext *_ctx, const std::shared_ptr<TreeNode2>& treeNode);
     virtual ~LineShapeGeometry2();
 
     void create(const std::shared_ptr<TreeNode2>& node, LineShapeRenderer2& _renderer);

@@ -137,7 +137,7 @@ Diagram2::createBase(gfloat zOffs, gfloat yOffs)
         Position p4(index2x(0), value2y(1.0f) - 0.002f, zOffs + m_StripeWidth);
         lgeom->addRect(p3, p4, c);
         lgeom->create_vao();
-        Glib::ustring name{"base"};
+        Glib::ustring name{"base "};
         if (m_sname) {
             auto lname = m_sname.lease();
             if (lname) {

@@ -62,7 +62,7 @@ private:
     NaviContext *m_shaderCtx;
     TextContext *m_textCtx;
     // Used to display texture
-    GLint m_texID;
+    //GLint m_texID;
     GLenum m_textType;
 };
 

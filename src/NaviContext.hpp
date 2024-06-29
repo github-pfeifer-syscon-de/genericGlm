@@ -41,7 +41,6 @@ public:
     psc::gl::aptrGeom2 hit2(float x, float y);
 protected:
     virtual void updateLocation() override;
-    Displayable *hit(float x, float y, std::list<Displayable *> &chldGeos);
     psc::gl::aptrGeom2 hit2(float x, float y, std::list<psc::gl::aptrGeom2>& list);
 
 private:

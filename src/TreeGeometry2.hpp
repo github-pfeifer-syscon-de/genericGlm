@@ -20,6 +20,7 @@
 
 #include <memory>
 
+#include "active_ptr.hpp"
 #include "TreeNode2.hpp"
 #include "Geom2.hpp"
 #include "TextContext.hpp"
@@ -27,14 +28,13 @@
 namespace psc {
 namespace gl {
 
-
-class TreeNode;
+class TreeNode2;
 
 class TreeGeometry2
 : public Geom2
 {
 public:
-    TreeGeometry2(GLenum type, GeometryContext *ctx);
+    TreeGeometry2(GLenum type, GeometryContext *ctx, const std::shared_ptr<TreeNode2>& treeNode);
     virtual ~TreeGeometry2() = default;
 
     virtual bool match(const psc::mem::active_ptr<TreeGeometry2>& treeGeo) = 0;
@@ -43,10 +43,10 @@ public:
     virtual void removeText() = 0;
     virtual void setTextVisible(bool visible) = 0;
 
-
+    std::weak_ptr<TreeNode2> getTreeNode();
 protected:
 private:
-
+    std::weak_ptr<TreeNode2> m_treeNode;    // make this weak as extending the lifetime of nodes is counterproductive!
 };
 
 

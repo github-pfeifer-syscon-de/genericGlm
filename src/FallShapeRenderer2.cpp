@@ -64,7 +64,7 @@ FallShapeRenderer2::createFallShape(const std::shared_ptr<TreeNode2>& node, Posi
 
     auto parentNode = node->getParent();
     bool toUpdate = false;
-    auto tempGeo = psc::mem::make_active<FallShapeGeometry2>(font, _ctx);
+    auto tempGeo = psc::mem::make_active<FallShapeGeometry2>(font, _ctx, node);
     auto nodeGeo = psc::mem::dynamic_pointer_cast<FallShapeGeometry2>(node->getTreeGeometry());
     if (!nodeGeo) {
         toUpdate = true;

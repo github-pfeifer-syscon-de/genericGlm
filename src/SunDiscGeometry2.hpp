@@ -30,7 +30,7 @@ namespace gl {
 class SunDiscGeometry2
 : public TextTreeGeometry2 {
 public:
-    SunDiscGeometry2(const psc::gl::ptrFont2& font, GeometryContext *_ctx);
+    SunDiscGeometry2(const psc::gl::ptrFont2& font, GeometryContext *_ctx, const std::shared_ptr<TreeNode2>& treeNode);
     virtual ~SunDiscGeometry2() = default;
 
     void update(double inner, double start, double size, Position &pos, const std::shared_ptr<TreeNode2>& treeNode);

@@ -26,8 +26,8 @@ namespace gl {
 
 
 
-TextTreeGeometry2::TextTreeGeometry2(const std::shared_ptr<Font2>& font, GeometryContext *_ctx)
-: TreeGeometry2::TreeGeometry2(GL_TRIANGLES, _ctx)
+TextTreeGeometry2::TextTreeGeometry2(const std::shared_ptr<Font2>& font, GeometryContext *_ctx, const std::shared_ptr<TreeNode2>& treeNode)
+: TreeGeometry2::TreeGeometry2(GL_TRIANGLES, _ctx, treeNode)
 , m_font{font}
 {
 }
@@ -42,6 +42,7 @@ TextTreeGeometry2::createText(const std::shared_ptr<TreeNode2>& treeNode, NaviCo
             ltext->setTextContext(txtCtx);
             Glib::ustring dName = treeNode->getDisplayName();
             ltext->setText(dName);
+            ltext->setName(dName);
             ltext->setScale(0.0040f);
             Position p2 = getTreePos();
             ltext->setPosition(p2);
@@ -66,24 +67,24 @@ TextTreeGeometry2::setTextVisible(bool visible)
     m_textVisible = visible;
     if (auto ltext = m_text.lease()) {
         ltext->setVisible(visible);
-        for (auto iter = geometries.begin(); iter != geometries.end(); ) {
-            auto& child = *iter;
-            if (child) {
-                auto treeChild = psc::mem::dynamic_pointer_cast<TextTreeGeometry2>(child);
-                if (treeChild) {
-                    if (auto ltreeChild = treeChild.lease()) {
-                        ltreeChild->setTextVisible(visible);
-                    }
+    }
+    for (auto iter = geometries.begin(); iter != geometries.end(); ) {
+        auto& child = *iter;
+        if (child) {
+            auto treeChild = psc::mem::dynamic_pointer_cast<TextTreeGeometry2>(child);
+            if (treeChild) {
+                if (auto ltreeChild = treeChild.lease()) {
+                    ltreeChild->setTextVisible(visible);
                 }
-                ++iter;
             }
-            else {
-                iter = geometries.erase(iter);
-            }
+            ++iter;
+        }
+        else {
+            iter = geometries.erase(iter);
         }
     }
-
 }
+
 
 
 

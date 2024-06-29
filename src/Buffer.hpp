@@ -20,6 +20,7 @@
 
 #include <cstdint>
 #include <memory>
+#include <vector>
 
 template<class T>
 class Buffer
@@ -39,7 +40,6 @@ public:
     T getMax() const;
     void reset();
 private:
-    uint32_t m_size;
-    std::unique_ptr<T[]> m_data;
+    std::vector<T> m_data;
     T m_sum;
 };

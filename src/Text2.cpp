@@ -40,11 +40,13 @@ Text2::Text2(GLenum type, NaviContext *ctx, const psc::gl::ptrFont2& font)
 , m_font{font}
 , m_shaderCtx{ctx}
 , m_textCtx{nullptr}
-, m_texID{0}
+//, m_texID{0}
 , m_textType{type}
 {
     setMarkable(false); // keep text unmarkable for now as we didn't get the bounds right
-
+    if (m_textType == GL_QUADS) {
+        std::cout << __FILE__ << "::Text2 unknown build (no longer supported) " << m_textType << std::endl;
+    }
 }
 
 
@@ -83,25 +85,25 @@ Text2::display(const Matrix &perspView)
         //m_shaderCtx->unuse();   // unuse prev.ctx
         m_textCtx->use();       // prefere a simpler text context for rendering
     }
-    if (m_textType == GL_QUADS
-      && getNumVertex() == 0) {
-        Position pc0(0.0f, 0.0f, 0.0f);
-        UV uv0(0.0f, 1.0f); // invert v as bitmap defined in scanline order gl is carthesian
-        Position pc1(0.0f, 1.0f, 0.0f);
-        UV uv1(0.0f, 0.0f);
-        Position pc2(1.0f, 1.0f, 0.0f);
-        UV uv2(1.0f, 0.0f);
-        Position pc3(1.0f, 0.0f, 0.0f);
-        UV uv3(1.0f, 1.0f);
-        addPoint(&pc0, nullptr, nullptr, &uv0);
-        addPoint(&pc1, nullptr, nullptr, &uv1);
-        addPoint(&pc2, nullptr, nullptr, &uv2);
-        addPoint(&pc0, nullptr, nullptr, &uv0);
-        addPoint(&pc2, nullptr, nullptr, &uv2);
-        addPoint(&pc3, nullptr, nullptr, &uv3);
-        create_vao();
-    }
-    //std::wcout << m_text << " phi " << getRotation().getPhi()
+//    if (m_textType == GL_QUADS
+//      && getNumVertex() == 0) {
+//        Position pc0(0.0f, 0.0f, 0.0f);
+//        UV uv0(0.0f, 1.0f); // invert v as bitmap defined in scanline order gl is carthesian
+//        Position pc1(0.0f, 1.0f, 0.0f);
+//        UV uv1(0.0f, 0.0f);
+//        Position pc2(1.0f, 1.0f, 0.0f);
+//        UV uv2(1.0f, 0.0f);
+//        Position pc3(1.0f, 0.0f, 0.0f);
+//        UV uv3(1.0f, 1.0f);
+//        addPoint(&pc0, nullptr, nullptr, &uv0);
+//        addPoint(&pc1, nullptr, nullptr, &uv1);
+//        addPoint(&pc2, nullptr, nullptr, &uv2);
+//        addPoint(&pc0, nullptr, nullptr, &uv0);
+//        addPoint(&pc2, nullptr, nullptr, &uv2);
+//        addPoint(&pc3, nullptr, nullptr, &uv3);
+//        create_vao();
+//    }
+    //std::cout << m_text << " phi " << getRotation().getPhi()
     //                     << " theta " << getRotation().getTheta()
     //                     << " psi " << getRotation().getPsi()
     //                     << std::endl;
@@ -110,17 +112,17 @@ Text2::display(const Matrix &perspView)
     glm::mat4 scaling = glm::scale(glm::vec3(m_scale));    // glm::mat4(1.0f),
     glm::mat4 rotationScaling = rotation * scaling;
 
-    if (m_textType == GL_QUADS) {
-        prepareTexture();
-    }
+    //if (m_textType == GL_QUADS) {
+    //    prepareTexture();
+    //}
     //std::cout << "Text2::display \"" << m_text << "\"" << std::endl;
     m_min = Position(999.0f);
     m_max = Position(-999.0f);
     Position p = getPos();
     float height = m_font->getLineHeight();
-    if (m_textType == GL_QUADS) {
-        height *= 0.035;
-    }
+    //if (m_textType == GL_QUADS) {
+    //    height *= 0.035;
+    //}
     glm::vec4 a(0.0f, -height, 0.0f, 0.0f);
     glm::vec3 lineskip(rotationScaling * a);
     int line = 0;
@@ -151,17 +153,18 @@ Text2::display(const Matrix &perspView)
                     g->displayLine(mvp);
                 }
                 else {
-                    if (g->bindTexture() > 0) { // allow glyphes without shape e.g. space (even if this value comes from a different world)
-                        Geom2::display(mvp);
-                    }
-                    else {
-                        std::cout << __FILE__ << ".display tried to use texture for " << c << ", but was not available!" << std::endl;
-                    }
+                    //if (g->bindTexture() > 0) { // allow glyphes without shape e.g. space (even if this value comes from a different world)
+                    //    Geom2::display(mvp);
+                    //}
+                    //else {
+                    //    std::cout << __FILE__ << ".display tried to use texture for " << c << ", but was not available!" << std::endl;
+                    //}
+                    std::cout << __FILE__ << ".display tried to use texture for " << c << ", but that is no longer supported!" << std::endl;
                 }
                 float dist = g->getAdvance();
-                if (m_textType == GL_QUADS) {
-                    dist *= 0.035;
-                }
+                //if (m_textType == GL_QUADS) {
+                //    dist *= 0.035;
+                //}
                 glm::vec4 a(dist, 0.0f, 0.0f, 0.0f);
                 glm::vec3 charskip(rotationScaling * a);
                 p += charskip;
@@ -177,9 +180,9 @@ Text2::display(const Matrix &perspView)
             }
         }
     }
-    if (m_textType == GL_QUADS) {
-        finishTexture();
-    }
+    //if (m_textType == GL_QUADS) {
+    //    finishTexture();
+    //}
     // as we captured the position with min & max use here w/o position
     Matrix mvp = m_shaderCtx->setModel(perspView, rotationScaling);
     updateClickBounds(mvp);
@@ -192,37 +195,37 @@ Text2::display(const Matrix &perspView)
 }
 
 
-void
-Text2::prepareTexture()
-{
-    if (m_textCtx) {
-        m_texID = glGetUniformLocation(m_textCtx->getProgram(), "renderedTexture");
-    }
-    else {
-        m_texID = glGetUniformLocation(m_shaderCtx->getProgram(), "renderedTexture");
-    }
-    glDepthMask(GL_FALSE);      // depth checking will care about existing values, but not writing new values, this is the best we can make out of transparency
-    checkError("glDepthMask GL_FALSE");
-    glEnable(GL_BLEND);
-    checkError("Font glEnableBlend");
-    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-    checkError("Font glBlendFunc");
-    glActiveTexture(GL_TEXTURE0);
-    checkError("glActiveTexture texture0");
-    glUniform1i(m_texID, 0);
-    checkError("glUniform1i m_texID");
-}
-
-void
-Text2::finishTexture()
-{
-    glBindTexture(GL_TEXTURE_2D, 0);
-    checkError("Font glBindTexture 0");
-    glDisable(GL_BLEND);
-    checkError("Font glDisableBlend");
-    glDepthMask(GL_TRUE);
-    checkError("glDepthMask GL_TRUE");
-}
+//void
+//Text2::prepareTexture()
+//{
+//    if (m_textCtx) {
+//        m_texID = glGetUniformLocation(m_textCtx->getProgram(), "renderedTexture");
+//    }
+//    else {
+//        m_texID = glGetUniformLocation(m_shaderCtx->getProgram(), "renderedTexture");
+//    }
+//    glDepthMask(GL_FALSE);      // depth checking will care about existing values, but not writing new values, this is the best we can make out of transparency
+//    checkError("glDepthMask GL_FALSE");
+//    glEnable(GL_BLEND);
+//    checkError("Font glEnableBlend");
+//    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+//    checkError("Font glBlendFunc");
+//    glActiveTexture(GL_TEXTURE0);
+//    checkError("glActiveTexture texture0");
+//    glUniform1i(m_texID, 0);
+//    checkError("glUniform1i m_texID");
+//}
+//
+//void
+//Text2::finishTexture()
+//{
+//    glBindTexture(GL_TEXTURE_2D, 0);
+//    checkError("Font glBindTexture 0");
+//    glDisable(GL_BLEND);
+//    checkError("Font glDisableBlend");
+//    glDepthMask(GL_TRUE);
+//    checkError("glDepthMask GL_TRUE");
+//}
 
 
 void

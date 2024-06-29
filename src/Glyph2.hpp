@@ -53,7 +53,7 @@ public:
     }
     void displayLine(Matrix& mv);
     void display(Matrix& mv);
-    GLint bindTexture();
+    //GLint bindTexture();
 
     bool extractGlyph(FT_Library library, FT_Face face, FT_UInt glyph_index, GLenum textType);
     void addFillPoint(const Position& pos, const Color &c, const Vector &n);
@@ -67,10 +67,10 @@ protected:
     GLfloat m_height;
     std::shared_ptr<Geom2> m_lineGeom;
     std::shared_ptr<Geom2> m_fillGeom;
-    GLuint m_tex;
+    //GLuint m_tex;
     GeometryContext *m_ctx;
 private:
-    void render2tex(FT_Library library, FT_Face face, FT_UInt glyph_index);
+    //void render2tex(FT_Library library, FT_Face face, FT_UInt glyph_index);
     void buildLineTriangels(FT_Library library, FT_Face face, FT_UInt glyph_index);
 
     bool tesselate(Polygons2 lines);

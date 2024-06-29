@@ -132,7 +132,7 @@ NaviContext::hit2(float x, float y, std::list<psc::gl::aptrGeom2>& list)
     if (!next_selected) {  // unsure recuse even with selection to find better match ? (and what is a better match ???)
         for (auto& geo : list) {
             if (auto lgeo2 = geo.lease()) {
-                auto nextGeos = lgeo2->getGeom2();
+                auto& nextGeos = lgeo2->getGeom2();
                 next_selected = hit2(x, y, nextGeos);
                 if (next_selected) {
                     break;
@@ -143,29 +143,3 @@ NaviContext::hit2(float x, float y, std::list<psc::gl::aptrGeom2>& list)
     return next_selected;
 
 }
-
-Displayable *
-NaviContext::hit(float x, float y, std::list<Displayable *> &chldGeos)
-{
-    Displayable *next_selected = nullptr;
-    for (auto g : chldGeos) { // breadth first
-        if (g->hit(x, y)) {
-            if (next_selected == nullptr
-             || next_selected->getViewMin().z > g->getViewMin().z) {
-                next_selected = g;
-                // keep trying to find in same hierarchy a better match...
-            }
-        }
-    }
-    if (next_selected == nullptr) {  // unsure recuse even with selection to find better match ? (and what is a better match ???)
-        for (auto g : chldGeos) {
-            auto nextGeos = g->getGeometries();
-            next_selected = hit(x, y, nextGeos);
-            if (next_selected != nullptr) {
-                break;
-            }
-        }
-    }
-    return next_selected;
-}
-

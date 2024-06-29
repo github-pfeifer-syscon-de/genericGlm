@@ -109,11 +109,11 @@ static /*constexpr*/ bool active_debug{false};
         {
             m_defered_reset = defered_reset;
         }
-        inline uint32_t get_usecount() const
+        inline size_t get_usecount() const
         {
             return m_usecount;
         }
-        inline uint32_t get_leasecount() const
+        inline size_t get_leasecount() const
         {
             return m_leasecount;
         }
@@ -176,8 +176,8 @@ static /*constexpr*/ bool active_debug{false};
     private:
         // Shared pointer
         T* m_ptr{nullptr};
-        std::atomic_uint32_t m_usecount{0u};
-        std::atomic_uint32_t m_leasecount{0u};
+        std::atomic_size_t m_usecount{0u};  // using size_t will save room on 32bit, but with 64bit no space is wasted
+        std::atomic_size_t m_leasecount{0u};
         bool m_defered_reset{false};
         std::allocator<A> m_alloc;
         mutable std::mutex m_changeMutex; // serialize decrement+free
@@ -419,6 +419,9 @@ static /*constexpr*/ bool active_debug{false};
 
         bool operator==(const active_ptr<T>& sp) const noexcept
         {
+            if (m_active_ctl == nullptr || sp.m_active_ctl == nullptr) {
+                return false;   // do not match if inactive
+            }
             return m_active_ctl == sp.m_active_ctl;
         }
 
@@ -446,14 +449,14 @@ static /*constexpr*/ bool active_debug{false};
         }
 
         // Reference count
-        uint32_t use_count() const
+        size_t use_count() const
         {
             return m_active_ctl
                     ? m_active_ctl->get_usecount()
                     : 0u;
         }
 
-        uint32_t lease_count() const
+        size_t lease_count() const
         {
             return m_active_ctl
                     ? m_active_ctl->get_leasecount()
