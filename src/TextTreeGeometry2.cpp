@@ -37,18 +37,19 @@ TextTreeGeometry2::createText(const std::shared_ptr<TreeNode2>& treeNode, NaviCo
 {
     if (!m_text) {
         m_text = psc::mem::make_active<psc::gl::Text2>(GL_TRIANGLES, _ctx, m_font);
-        auto ltext = m_text.lease();
-        if (ltext) {
+        if (auto ltext = m_text.lease()) {
             ltext->setTextContext(txtCtx);
             Glib::ustring dName = treeNode->getDisplayName();
             ltext->setText(dName);
             ltext->setName(dName);
             ltext->setScale(0.0040f);
-            Position p2 = getTreePos();
-            ltext->setPosition(p2);
             addGeometry(m_text);   // this will care for transfrom if piece is moved
             ltext->setVisible(m_textVisible);
         }
+    }
+    if (auto ltext = m_text.lease()) {
+        auto& p2 = getTreePos();
+        ltext->setPosition(p2);
     }
     // direct display will not use the correct (concat) transform
     //m_text->display(persView);

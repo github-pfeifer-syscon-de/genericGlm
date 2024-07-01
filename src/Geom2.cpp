@@ -87,6 +87,8 @@ Geom2::deleteVertexArray()
         glDeleteVertexArrays(1, &m_vao);
         m_vao = 0;
     }
+    m_min = {999.0f, 999.0f, 999.0f};   // the bounds are obsolete as well
+    m_max = {-999.0f, -999.0f, -999.0f};
 }
 
 void
@@ -111,32 +113,27 @@ Geom2::addPoint(
     min(m_min, p);
     max(m_max, p);
     if (m_ctx->useColor()) {
-        auto defCol{Color(1.0f)};
         auto tp = (c != nullptr ? c : &defCol);
         m_vertexes.push_back(tp->r);
         m_vertexes.push_back(tp->g);
         m_vertexes.push_back(tp->b);
     }
     if (m_ctx->useNormal()) {
-        auto defNor{Vector(0.0f, 1.0f, 0.0f)};
         auto tn = (n != nullptr ? n : &defNor);
         m_vertexes.push_back(tn->x);
         m_vertexes.push_back(tn->y);
         m_vertexes.push_back(tn->z);
     }
     if (m_ctx->useUV()) {
-        auto defUV{UV(0.0f)};
         auto tuv = (uv != nullptr ? uv : &defUV);
         m_vertexes.push_back(tuv->s);
         m_vertexes.push_back(tuv->t);
     }
     if (m_ctx->useNormalMap()) {
-        auto defTan{Vector(1.0f, 0.0f, 0.0f)};
         auto ttan = (tangent != nullptr ? tangent : &defTan);
         m_vertexes.push_back(ttan->x);
         m_vertexes.push_back(ttan->y);
         m_vertexes.push_back(ttan->z);
-        auto defBitan{Vector(0.0f, 0.0f, 1.0f)};
         auto tbitan = (bitangent != nullptr ? bitangent : &defBitan);
         m_vertexes.push_back(tbitan->x);
         m_vertexes.push_back(tbitan->y);
@@ -437,8 +434,7 @@ Geom2::display(NaviContext* context, const Matrix &projView)
     for (auto it = geometries.begin(); it != geometries.end(); ) {
         auto& cgeo = *it;
         if (cgeo) {
-            auto lgeo = cgeo.lease();
-            if (lgeo) {
+            if (auto lgeo = cgeo.lease()) {
                 //if (lgeo->getName() != "") {
                 //    std::cout << "display " << lgeo->getName() << std::endl;
                 //}
@@ -536,23 +532,6 @@ Geom2::removeGeometry(Geom2* geo)
     }
 }
 
-std::list<Displayable *> &
-Geom2::getGeometries()
-{
-    std::cout << "Geom2::getGeometries not implemented!!!" << std::endl;
-    // this just shows :0
-    //auto trace = std::stacktrace::current();
-    // this does not log all calls
-    //for (const auto& entry: trace) {
-    //    std::cout << std::to_string(entry) << '\n';
-    //}
-    size_t size;
-    enum Constexpr { MAX_SIZE = 1024 };
-    void *array[MAX_SIZE];
-    size = backtrace(array, MAX_SIZE);
-    backtrace_symbols_fd(array, size, STDOUT_FILENO);
-    return m_legacyGeometries;
-}
 
 std::list<aptrGeom2>&
 Geom2::getGeom2()
@@ -745,40 +724,42 @@ Geom2::updateClickBounds(glm::mat4 &mvp)
     if (!m_markable) {
         return;
     }
-    glm::vec4 pm1(m_min.x, m_min.y, m_min.z, 1.0f);
-    glm::vec4 pm2(m_max.x, m_min.y, m_min.z, 1.0f);
-    glm::vec4 pm3(m_max.x, m_max.y, m_min.z, 1.0f);
-    glm::vec4 pm4(m_min.x, m_max.y, m_min.z, 1.0f);
-    glm::vec4 pm5(m_min.x, m_min.y, m_max.z, 1.0f);
-    glm::vec4 pm6(m_max.x, m_min.y, m_max.z, 1.0f);
-    glm::vec4 pm7(m_max.x, m_max.y, m_max.z, 1.0f);
-    glm::vec4 pm8(m_min.x, m_max.y, m_max.z, 1.0f);
-    glm::vec4 pv1 = mvp * pm1;
-    glm::vec4 pv2 = mvp * pm2;
-    glm::vec4 pv3 = mvp * pm3;
-    glm::vec4 pv4 = mvp * pm4;
-    glm::vec4 pv5 = mvp * pm5;
-    glm::vec4 pv6 = mvp * pm6;
-    glm::vec4 pv7 = mvp * pm7;
-    glm::vec4 pv8 = mvp * pm8;
-    Position p1(glm::vec3(pv1)/pv1.w);   // to ogl view box
-    Position p2(glm::vec3(pv2)/pv2.w);
-    Position p3(glm::vec3(pv3)/pv3.w);
-    Position p4(glm::vec3(pv4)/pv4.w);
-    Position p5(glm::vec3(pv5)/pv5.w);
-    Position p6(glm::vec3(pv6)/pv6.w);
-    Position p7(glm::vec3(pv7)/pv7.w);
-    Position p8(glm::vec3(pv8)/pv8.w);
-    v_min = Position(999.0f, 999.0f, 999.0f);
-    v_max = Position(-999.0f, -999.0f, -999.0f);
-    min(v_min, &p1); max(v_max, &p1);
-    min(v_min, &p2); max(v_max, &p2);
-    min(v_min, &p3); max(v_max, &p3);
-    min(v_min, &p4); max(v_max, &p4);
-    min(v_min, &p5); max(v_max, &p5);
-    min(v_min, &p6); max(v_max, &p6);
-    min(v_min, &p7); max(v_max, &p7);
-    min(v_min, &p8); max(v_max, &p8);
+    v_min = Position{999.0f, 999.0f, 999.0f};
+    v_max = Position{-999.0f, -999.0f, -999.0f};
+    for (uint32_t i = 0; i < 8; ++i) {
+        glm::vec4 pm;
+        switch(i) {
+        case 0:
+            pm = {m_min.x, m_min.y, m_min.z, 1.0f};
+            break;
+        case 1:
+            pm = {m_max.x, m_min.y, m_min.z, 1.0f};
+            break;
+        case 2:
+            pm = {m_max.x, m_max.y, m_min.z, 1.0f};
+            break;
+        case 3:
+            pm = {m_min.x, m_max.y, m_min.z, 1.0f};
+            break;
+        case 4:
+            pm = {m_min.x, m_min.y, m_max.z, 1.0f};
+            break;
+        case 5:
+            pm = {m_max.x, m_min.y, m_max.z, 1.0f};
+            break;
+        case 6:
+            pm = {m_max.x, m_max.y, m_max.z, 1.0f};
+            break;
+        case 7:
+            pm = {m_min.x, m_max.y, m_max.z, 1.0f};
+            break;
+        }
+        glm::vec4 pv{mvp * pm};
+        Position p{glm::vec3(pv) / pv.w};   // to ogl view box
+        min(v_min, &p);
+        max(v_max, &p);
+    }
+
     //std::cout << "updateClick bounds " << std::hex << this << std::dec
     //          << " min " << v_min.x << " " << v_min.y << " " << v_min.z
     //          << " max " << v_max.x << " " << v_max.y << " " << v_max.z << std::endl;

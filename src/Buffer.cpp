@@ -15,11 +15,9 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-
+#include <algorithm>
 
 #include "Buffer.hpp"
-//#include <algorithm> if we getting std::copy to work
-//#include <iterator>
 
 template<class T>
 Buffer<T>::Buffer(uint32_t _size)
@@ -90,10 +88,11 @@ template<class T> void
 Buffer<T>::roll()
 {
     m_sum -= m_data[0];
-    // std::move is a bit unclear about overlapping area
-    for (auto i = 0u; i < (m_data.size() - 1); ++i) {
-        m_data[i] = m_data[i + 1];
-    }
+    // use std::move if we take the rule target cannot be in [begin end) seriously this should work...
+    std::move(m_data.begin()+1, m_data.end(), m_data.begin());
+    //for (auto i = 0u; i < (m_data.size() - 1); ++i) {
+    //    m_data[i] = m_data[i + 1];
+    //}
     m_data[m_data.size() - 1] = static_cast<T>(0);        // if we wont get updates use 0
 }
 

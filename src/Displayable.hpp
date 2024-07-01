@@ -46,7 +46,6 @@ public:
 
     virtual void display(const Matrix &mvp) = 0;
     virtual void updateClickBounds(glm::mat4 &mvp) = 0;
-    virtual std::list<Displayable *> &getGeometries() = 0;
     virtual void resetMaster() = 0;
     virtual bool hit(float x, float y) = 0;
     virtual Position& getViewMin() = 0;
@@ -66,7 +65,6 @@ public:
     bool isMarkable();
     bool isVisible();
     virtual void setVisible(bool visible);
-    void setRemoveFromCtx(bool removeFromCtx);
     void setContext(GeometryContext* ctx);
 protected:
     Matrix m_transform;
@@ -75,7 +73,6 @@ protected:
     Rotational m_rotate;
     bool m_visible;
     bool m_markable;
-    bool m_removeFromctx;
     GeometryContext *m_ctx;
 
 private:

@@ -34,7 +34,6 @@ Displayable::Displayable(GeometryContext* _ctx)
 , m_rotate{0.0f,0.0f,0.0f}
 , m_visible{true}
 , m_markable{true}
-, m_removeFromctx{false}
 , m_ctx{_ctx}
 {
 }
@@ -130,12 +129,6 @@ void
 Displayable::setVisible(bool visible)
 {
     m_visible = visible;
-}
-
-void
-Displayable::setRemoveFromCtx(bool removeFromCtx)
-{
-    m_removeFromctx = removeFromCtx;
 }
 
 Matrix &

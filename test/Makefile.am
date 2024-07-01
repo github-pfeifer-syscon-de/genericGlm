@@ -1,5 +1,5 @@
 
-TESTS = ptr_test
+TESTS = ptr_test buf_test
 
 AM_CPPFLAGS = \
 	-DPACKAGE_LOCALE_DIR=\""$(localedir)"\" \
@@ -14,12 +14,16 @@ AM_CFLAGS= \
 AM_CXXFLAGS = \
 	-Wall -Wpedantic
 
-check_LIBADD =  \
+check_PROGRAMS = ptr_test buf_test
+
+ptr_test_LDADD =  \
 	$(GENERICIMG_LIBS)
 
-check_PROGRAMS = ptr_test
-
+buf_test_LDADD = \
+	-L../src/.libs -lgenericglm
 
 ptr_test_SOURCES = \
     ptr_main.cpp
 
+buf_test_SOURCES = \
+    buf_main.cpp

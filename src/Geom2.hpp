@@ -95,7 +95,6 @@ public:
     void addGeometry(aptrGeom2 geo);
     virtual void setMaster(Geom2* geo);
     void removeGeometry(Geom2* geo);
-    std::list<Displayable *> &getGeometries();
     std::list<aptrGeom2>& getGeom2();
     void setDebugGeometry(const aptrGeom2& geo);
     void resetMaster() override;
@@ -119,6 +118,12 @@ private:
     unsigned int m_numVertex;       // number of elements
     unsigned int m_stride_size;
     unsigned int m_numIndex;
+
+    static constexpr Color defCol{1.0f, 1.0f, 1.0f};
+    static constexpr Vector defNor{0.0f, 1.0f, 0.0f};
+    static constexpr UV defUV{0.0f, 0.0f};
+    static constexpr Vector defTan{1.0f, 0.0f, 0.0f};
+    static constexpr Vector defBitan{0.0f, 0.0f, 1.0f};
 };
 
 class Tex2;

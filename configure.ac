@@ -62,8 +62,8 @@ fi
 
 AC_CONFIG_FILES([
 Makefile
+src/Makefile
 test/Makefile
 src/genericglm.pc
-src/Makefile
 ])
 AC_OUTPUT

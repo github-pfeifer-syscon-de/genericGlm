@@ -52,3 +52,7 @@
 /test/ptr_test.log
 /test/ptr_test
 /test/.deps/ptr_main.Tpo
+/test/buf_test.log
+/test/buf_test
+/test/buf_test.trs
+/test/.libs/buf_test

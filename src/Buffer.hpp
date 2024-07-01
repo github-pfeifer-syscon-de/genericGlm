@@ -30,6 +30,9 @@ public:
     Buffer(const Buffer& orig);
     virtual ~Buffer() = default;
 
+    inline uint32_t getSize() {
+        return m_data.size();
+    }
     void roll();
     void set(T _value);
     void add(const std::shared_ptr<Buffer<T>> &values);
