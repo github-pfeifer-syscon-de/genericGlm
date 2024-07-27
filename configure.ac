@@ -43,13 +43,12 @@ PKG_CHECK_MODULES(FONTCONFIG, [$depend_fontconfig])
 AC_ARG_WITH([gles], AS_HELP_STRING([--with-gles], [use openGL ES 3 (Raspi) otherweise fullgl]))
 
 if test "x$with_gles" = "xyes" ; then
-    PKG_CHECK_MODULES(EPOXY,[glesv2], [AC_DEFINE([USE_GLES], [1], [Using openGL ES 3])])
-    depend_epoxy="glesv2"
+    depend_ogl="glesv2"
+    PKG_CHECK_MODULES(EPOXY,[$depend_ogl], [AC_DEFINE([USE_GLES], [1], [Using openGL ES 3])])
 else
-    PKG_CHECK_MODULES(EPOXY,[epoxy])
-    depend_epoxy="epoxy"
+    depend_ogl="epoxy"
+    PKG_CHECK_MODULES(EPOXY,[$depend_ogl])
 fi
-AC_SUBST([depend_epoxy])
 
 depend_gtkmm="gtkmm-3.0"
 AC_SUBST([depend_gtkmm])
