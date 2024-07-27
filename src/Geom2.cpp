@@ -24,7 +24,6 @@
 #define GLM_ENABLE_EXPERIMENTAL
 #include <glm/gtx/normal.hpp> // triangleNormal
 //#include <stacktrace>       // wait for c++23
-#include <execinfo.h>   /* backtrace, backtrace_symbols_fd */
 #include <unistd.h>     /* STDOUT_FILENO */
 
 #include "Font2.hpp"
