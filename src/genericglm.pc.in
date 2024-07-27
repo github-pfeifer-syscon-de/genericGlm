@@ -8,6 +8,6 @@ includedir=@includedir@/genericglm
 Name: libgenericglm
 Description: Basic openGL rendering support lib.
 Version: @VERSION@
-Requires: fontconfig gtkmm-3.0 glibmm-2.4 giomm-2.4 glm genericimg >= 0.3.1 glu
+Requires: @depend_fontconfig@ @depend_gtkmm@ @depend_glibmm@ @depend_glm@ @depend_genericimg@ @depend_glu@
 Libs: -L${libdir} -lgenericglm
 Cflags: -I${includedir}
