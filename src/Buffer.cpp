@@ -75,7 +75,7 @@ Buffer<T>::get(uint32_t idx) const
 template<class T> T
 Buffer<T>::getMax() const
 {
-    T max = 1;
+    T max = static_cast<T>(1);
     for (auto i = 0u; i < m_data.size(); i++) {
         if (max < get(i)) {
             max = get(i);
@@ -88,7 +88,7 @@ template<class T> void
 Buffer<T>::roll()
 {
     m_sum -= m_data[0];
-    // use std::move if we take the rule target cannot be in [begin end) seriously this should work...
+    // use std::move if we take the rule: target cannot be in [begin end) seriously this should work (nothing is said about the later transfer cannot overlap the previous)
     std::move(m_data.begin()+1, m_data.end(), m_data.begin());
     //for (auto i = 0u; i < (m_data.size() - 1); ++i) {
     //    m_data[i] = m_data[i + 1];

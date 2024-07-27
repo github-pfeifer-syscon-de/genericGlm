@@ -357,7 +357,7 @@ static /*constexpr*/ bool active_debug{false};
         }
         /**
          */
-        constexpr active_ptr(nullptr_t) noexcept
+        constexpr active_ptr(std::nullptr_t) noexcept
         : active_ptr()
         {
         }

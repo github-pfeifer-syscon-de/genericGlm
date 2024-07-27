@@ -21,6 +21,7 @@ For windows (get msys2 https://www.msys2.org/) the files shoud adapt use e.g.<br
 (use "msys2 mingw64" window/shell see tooltip)<br>
 <pre>
   ./configure --prefix=/mingw64
+  (with the newst version the if host is not undertood so comment: PKG_CHECK_MODULES(GLU, [glu]))
 </pre>
 For Debian you may need the following steps (prefix # execute with sudo/root prefix > as user):
 <pre>

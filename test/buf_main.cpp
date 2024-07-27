@@ -18,7 +18,6 @@
 
 #include <iostream>
 #include <cstdlib>
-#include <algorithm> //if we getting std::copy to work
 #include <iterator>
 
 #include "Buffer.hpp"
