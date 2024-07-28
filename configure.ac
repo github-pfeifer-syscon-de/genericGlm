@@ -50,13 +50,11 @@ else
     PKG_CHECK_MODULES(EPOXY,[$depend_ogl])
 fi
 
-depend_gtkmm="gtkmm-3.0"
-AC_SUBST([depend_gtkmm])
-PKG_CHECK_MODULES(GTKMM,$depend_gtkmm)
+dnl already imported with genericImg
+dnl PKG_CHECK_MODULES(GTKMM,[genericImg])
 
-depend_glibmm="glibmm-2.4 giomm-2.4"
-AC_SUBST([depend_glibmm])
-PKG_CHECK_MODULES([GLIBMM], [$depend_glibmm])
+dnl already imported with genericImg
+dnl PKG_CHECK_MODULES([GLIBMM], [glibmm-2.4 giomm-2.4])
 
 depend_glm="glm"
 AC_SUBST([depend_glm])
