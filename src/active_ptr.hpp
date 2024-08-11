@@ -419,13 +419,15 @@ static /*constexpr*/ bool active_debug{false};
 
         bool operator==(const active_ptr<T>& sp) const noexcept
         {
-            if (m_active_ctl == nullptr || sp.m_active_ctl == nullptr) {
-                return false;   // do not match if inactive
+            // compare directly, will also make the legacy "this != nullptr" work
+            if (m_active_ctl != nullptr
+             && sp.m_active_ctl != nullptr) {
+                // make check work for instances where one instance was reset
+                return m_active_ctl->get_ptr() == sp.m_active_ctl->get_ptr();
             }
             return m_active_ctl == sp.m_active_ctl;
         }
 
-        // name reset would have been more clear
         void resetThis()
         {
             if (m_active_ctl) {
@@ -438,6 +440,7 @@ static /*constexpr*/ bool active_debug{false};
                 }
             }
             removeControlIfUnsued();
+            m_active_ctl = nullptr;     // consider this as unlinked
         }
 
         void resetAll()
@@ -446,6 +449,7 @@ static /*constexpr*/ bool active_debug{false};
                 std::lock_guard<std::mutex> lock(m_active_ctl->get_mutex());
                 m_active_ctl->reset();
             }
+            resetThis();
         }
 
         // Reference count

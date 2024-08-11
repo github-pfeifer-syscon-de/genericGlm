@@ -267,8 +267,12 @@ coversionTest()
             return false;
         }
         base = active_ptr1;     // implicit conversion
-        auto lemty2 = active_ptr1.lease(); // check access to value ptr
-        if (!lemty2) {
+        active_ptr1.resetThis();
+        if (auto lemty2 = base.lease()) {
+            base.resetThis();
+            lemty2->dummy(); // still usable?
+        }
+        else {
             std::cout << "second 2 no access" << std::endl;
             return false;
         }
@@ -278,6 +282,43 @@ coversionTest()
               << " test " << testFreed
               << std::endl;
     return baseFreed == 0 && testFreed == 0;
+}
+
+static bool
+compareTest()
+{
+    baseFreed = 0;
+    testFreed = 0;
+    std::cout << "compare ---------- " << std::endl;
+    {
+        psc::mem::active_ptr<Base> base;
+        if (base != nullptr) {    // this might happend while migrating, and should still work
+            std::cout << "base and nullptr are not equal!" << std::endl;
+            return false;
+        }
+        auto active_ptr1 = psc::mem::make_active<Test>(33);
+        auto unrelated = psc::mem::dynamic_pointer_cast<Unrelated>(base);
+        if (unrelated != nullptr) {    // if this becomes active there is something wrong
+            std::cout << "unrealted and nullptr are not equal!" << std::endl;
+            return false;
+        }
+        base = active_ptr1;     // implicit conversion
+        if (base != active_ptr1) {
+            std::cout << "base and active not equal!" << std::endl;
+            return false;
+        }
+        base.resetThis();
+        if (base == active_ptr1) {
+            std::cout << "after reset base and active are equal!" << std::endl;
+            return false;
+        }
+    }
+    std::cout << "compare ---------- "
+              << " base " << baseFreed
+              << " test " << testFreed
+              << std::endl;
+    return baseFreed == 0 && testFreed == 0;
+
 }
 
 static psc::mem::active_ptr<Base>
@@ -317,6 +358,34 @@ creationTest()
 }
 
 static bool
+sharedTest()
+{
+    // try some shared_ptr behaviour
+    std::cout << "shared -----------" << std::endl;
+    {
+        std::vector<std::shared_ptr<Test>> coll;
+        auto shr = std::make_shared<Test>(88);
+        std::cout << "shr use count " << shr.use_count() << std::endl;
+        coll.emplace_back(std::move(shr));
+        std::cout << "shr use count " << shr.use_count() << std::endl;  // as it seems
+        for (auto& back : coll) {
+            //coll.pop_back();
+            std::cout << "shr use count " << back.use_count() << std::endl;
+        }
+        std::vector<psc::mem::active_ptr<Test>> coll2;
+        auto aut = psc::mem::make_active<Test>(89);
+        std::cout << "act use count " << aut.use_count() << std::endl;
+        coll2.emplace_back(std::move(aut));
+        std::cout << "act use count " << aut.use_count() << std::endl;  // if collection is the same type as ptr, rval assigment is used :)
+        for (auto& back : coll2) {
+            std::cout << "act use count " << back.use_count() << std::endl;
+        }
+    }
+    std::cout << "shared -----------" << std::endl;
+    return true;
+}
+
+static bool
 collectionTest()
 {
     baseFreed = 0;
@@ -326,7 +395,7 @@ collectionTest()
         TQueueConcurrent<psc::mem::active_ptr<Base>> thumbnailReaderQueue;
         auto entry = psc::mem::make_active<Test>(99);
         std::cout << "collcc emplace_back --------" << std::endl;
-        thumbnailReaderQueue.emplace_back(entry);
+        thumbnailReaderQueue.emplace_back(std::move(entry));
         std::cout << "collcc pop_front -----" << std::endl;
         auto front = thumbnailReaderQueue.pop_front();
         std::cout << "collcc poped_front -----" << std::endl;
@@ -398,22 +467,28 @@ main(int argc, char** argv) {
         return 1;
     }
     if (!ptrTest()) {
-        return 1;
+        return 2;
     }
     if (!coversionTest()) {
-        return 1;
+        return 3;
     }
     if (!livespanTest()) {
-        return 1;
+        return 4;
     }
     if (!releaseTest()) {
-        return 1;
+        return 5;
     }
     if (!creationTest()) {
-        return 1;
+        return 6;
     }
     if (!collectionTest()) {
-        return 1;
+        return 7;
+    }
+    if (!compareTest()) {
+        return 8;
+    }
+    if (!sharedTest()) {
+        return 9;
     }
 
     return 0;
