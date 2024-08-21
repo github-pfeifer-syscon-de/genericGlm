@@ -51,7 +51,7 @@ SunDiscGeometry2::create(
     short idx = 0;
     double outer = m_inner + _renderer.getDistIncrement() - _renderer.getRadiusGap();
     double end = m_start + m_size;
-    double step = M_PI * 2.0 / 60.0;   // approximate circle by 60 sections or 120 triangles
+    double step = M_PI * 2.0 / circleApproximation;   // approximate circle by 60 sections or 120 triangles
     bool firstEnd = TRUE;
     deleteVertexArray();
     double midR = m_start + m_size / 2.0;
@@ -65,6 +65,8 @@ SunDiscGeometry2::create(
     m_treePos.z = m_inner * co;
     float yh = 0.1f;
     Vector nt(0.0f, -1.0f, 0.0f);   // normal top
+    auto guessSteps = static_cast<uint32_t>(1.2 * m_size / step);
+    addReserve(guessSteps*6u, guessSteps*8u);
     for (double i = m_start; i <= end; ) {
         si = std::sin(i);
         co =  std::cos(i);

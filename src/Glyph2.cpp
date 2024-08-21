@@ -281,6 +281,7 @@ Glyph2::buildLineTriangels(FT_Library library, FT_Face face, FT_UInt glyph_index
     pGlyph2 = this;
     FT_Outline* outline = &face->glyph->outline;
     Polygons2 polys;
+    uint32_t points{0};
     #ifdef DIRECT_SCAN
     // allows using contour info from structure
     //std::cout << std::hex << "0x" << (int)glyph << std::dec
@@ -294,9 +295,12 @@ Glyph2::buildLineTriangels(FT_Library library, FT_Face face, FT_UInt glyph_index
             auto poly = std::make_shared<struct Polygon2>();
             poly->addPoints(outline, startIdx, endIdx, cont);
             polys.push_back(poly);
+            ++points;
         }
         startIdx = endIdx + 1;
     }
+    m_lineGeom->addReserve(points, 0);
+    m_fillGeom->addReserve(points, 0);
     #else
     FT_Outline_Funcs func_interface;
     func_interface.move_to = (FT_Outline_MoveToFunc)move_to;

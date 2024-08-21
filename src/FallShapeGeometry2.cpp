@@ -77,6 +77,7 @@ FallShapeGeometry2::create(const std::shared_ptr<TreeNode2>& node, FallShapeRend
 
     Color c0 = _renderer.pos2Color(m_start.x, node->getStage(), m_load, node->isPrimary());
     Color c2 = _renderer.pos2Color(end.x, node->getStage(), m_load, node->isPrimary());
+    addReserve(20, 30);
     addPoint(&p0, &c0, &nt);    // 0 top
     addPoint(&p1, &c0, &nt);    // 1
     addPoint(&p2, &c2, &nt);    // 2

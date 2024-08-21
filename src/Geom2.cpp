@@ -159,6 +159,7 @@ Geom2::addIndex(uint32_t idx)
 void
 Geom2::addIndex(uint32_t idx1, uint32_t idx2)
 {
+    addReserve(0, 4);
     m_indexes.push_back(checkIndex(idx1));
     m_indexes.push_back(checkIndex(idx2));
 }
@@ -166,6 +167,7 @@ Geom2::addIndex(uint32_t idx1, uint32_t idx2)
 void
 Geom2::addIndex(uint32_t idx1, uint32_t idx2, uint32_t idx3)
 {
+    addReserve(0, 6);
     m_indexes.push_back(checkIndex(idx1));
     m_indexes.push_back(checkIndex(idx2));
     m_indexes.push_back(checkIndex(idx3));
@@ -173,6 +175,7 @@ Geom2::addIndex(uint32_t idx1, uint32_t idx2, uint32_t idx3)
 
 void
 Geom2::addLine(Position &p1, Position &p2, Color &c, Vector *n) {
+    addReserve(3, 0);
     addPoint(&p1, &c, n);
     addPoint(&p2, &c, n);
 }
@@ -183,6 +186,7 @@ Geom2::addLine(Position &p1, Position &p2, Color &c, Vector *n) {
 void
 Geom2::addRect(Position &p1, Position &p2, Color &c)
 {
+    addReserve(6, 0);
     Position pos[6];
     pos[0] = p1;
 
@@ -225,6 +229,7 @@ Geom2::addTri(Position &p1, Position &p2, Position &p3, Color &c)
     pos[2] = p3;
 
     Vector norm;
+    addReserve(3, 0);
     if (m_ctx->useNormal()) {
         norm = glm::triangleNormal(pos[0], pos[1], pos[2]);
     } else {
@@ -238,9 +243,23 @@ Geom2::addTri(Position &p1, Position &p2, Position &p3, Color &c)
     }
 }
 
+// ensure the capacity can store the requested numbers
+void
+Geom2::addReserve(uint32_t addVertexes, uint32_t addIndex)
+{
+    if (m_vertexes.capacity() < m_vertexes.size() + addVertexes) {
+        m_vertexes.reserve(m_vertexes.size() + addVertexes);
+    }
+    if (m_indexes.capacity() < m_indexes.size() + addIndex) {
+        m_indexes.reserve(m_indexes.size() + addIndex);
+    }
+}
+
+
 void
 Geom2::addCube(float dist, Color &c)
 {
+    addReserve(12, 72);  // 8, 48 would be exact fit, but increase this
     Position p0(-dist, -dist, -dist);
     Position p1(dist, dist, -dist);
     Position p2(dist, -dist, -dist);
@@ -545,6 +564,7 @@ Geom2::addSphere(float radius, unsigned int rings, unsigned int sectors)
 // https://stackoverflow.com/questions/5988686/creating-a-3d-sphere-in-opengl-using-visual-c
     unsigned int r, s;
 
+    addReserve(rings * sectors, rings * sectors * 6u);
     // as these values are expensive and will get used often precalculate
     auto sinLon{std::vector<double>(sectors)};
     auto cosLon{std::vector<double>(sectors)};
@@ -600,7 +620,6 @@ Geom2::addSphere(float radius, unsigned int rings, unsigned int sectors)
         }
     }
 
-    m_indexes.reserve(rings * sectors * 6);
     for(r = 0; r < rings; r++) {
         for(s = 0; s < sectors; s++) {
             GLushort i0 = (GLushort)(r * sectors + s);

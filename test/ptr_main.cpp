@@ -360,6 +360,8 @@ creationTest()
 static bool
 sharedTest()
 {
+    baseFreed = 0;
+    testFreed = 0;
     // try some shared_ptr behaviour
     std::cout << "shared -----------" << std::endl;
     {
@@ -381,8 +383,12 @@ sharedTest()
             std::cout << "act use count " << back.use_count() << std::endl;
         }
     }
-    std::cout << "shared -----------" << std::endl;
-    return true;
+    std::cout << "shared -----------"
+              << " base " << baseFreed
+              << " test " << testFreed
+              << std::endl;
+
+    return baseFreed == 0 && testFreed == 0;
 }
 
 static bool
@@ -462,7 +468,7 @@ livespanTest()
 
 int
 main(int argc, char** argv) {
-    psc::mem::active_debug = true; // if needed change active_debug to no const
+    psc::mem::active_debug = false; // if needed change active_debug to no const
     if (!simpleTest()) {
         return 1;
     }

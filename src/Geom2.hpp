@@ -70,6 +70,7 @@ public:
           , const UV* uv = nullptr
           , const Vector* tangent = nullptr
           , const Vector* bitagent = nullptr);
+    void addReserve(uint32_t addVertexes, uint32_t addIndex);
     void addCube(float size, Color& c);
     void addSphere(float radius, unsigned int rings, unsigned int sectors);
     void addCylinder(float radius, float start, float end, Color* c, unsigned int approx = 36);

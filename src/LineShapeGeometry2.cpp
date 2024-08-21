@@ -82,6 +82,7 @@ LineShapeGeometry2::create(const std::shared_ptr<TreeNode2>& node, LineShapeRend
     Position p7(p3 + depthOffs);
 
     Color c0 = _renderer.pos2Color(m_mid.x, node->getStage(), m_load, node->isPrimary());
+    addReserve(20, 30);
     addPoint(&p0, &c0, &nt);    // 0 top
     addPoint(&p1, &c0, &nt);    // 1
     addPoint(&p2, &c0, &nt);    // 2

@@ -43,6 +43,7 @@ protected:
     TreeNodeState m_stage{TreeNodeState::New};
     float m_load{0.0f};
     Position m_pos{0.0f};
+    static constexpr auto circleApproximation{60.0};
 private:
 
 };
