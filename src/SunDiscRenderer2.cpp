@@ -79,8 +79,7 @@ SunDiscRenderer2::createSunDisc(
         node->setTreeGeometry(nodeGeo);
     }
     else {
-        auto ltempGeo = tempGeo.lease();
-        if (ltempGeo) {
+        if (auto ltempGeo = tempGeo.lease()) {
             ltempGeo->update(inner, start, size, pos, node);
             toUpdate = !ltempGeo->match(nodeGeo);
         }
@@ -99,8 +98,7 @@ SunDiscRenderer2::createSunDisc(
     if (parentNode) {        // in any case rebuild structure as parent may have changed
         auto parentGeo = parentNode->getTreeGeometry();
         //std::cout << "add " << std::hex << tGeo << " to " << std::hex << parentGeo << std::endl;
-        auto lParentGeo = parentGeo.lease();
-        if (lParentGeo) {
+        if (auto lParentGeo = parentGeo.lease()) {
             lParentGeo->addGeometry(nodeGeo);       // replicate structure on geometries to allow breaking out tree parts
         }
     }

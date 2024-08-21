@@ -95,10 +95,8 @@ TreeNode2::getLeafCount()
 void
 TreeNode2::setTreeGeometry(const psc::mem::active_ptr<TreeGeometry2>& _treeGeometry)
 {
-    auto _ltreeGeo = _treeGeometry.lease();
-    if (_ltreeGeo) {
-        auto lmTreeGeo = m_treeGeometry.lease();
-        if (lmTreeGeo) {
+    if (auto _ltreeGeo = _treeGeometry.lease()) {
+        if (auto lmTreeGeo = m_treeGeometry.lease()) {
             _ltreeGeo->setPosition(lmTreeGeo->getPos());   // inherit a possibly modified transform
             _ltreeGeo->setScale(lmTreeGeo->getScale());
             _ltreeGeo->setRotation(lmTreeGeo->getRotation());

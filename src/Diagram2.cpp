@@ -63,8 +63,7 @@ void
 Diagram2::setPosition(Position &pos)
 {
     auto base = getBase();
-    auto lbase = base.lease();
-    if (lbase) {
+    if (auto lbase = base.lease()) {
         lbase->setPosition(pos);
     }
 }
@@ -80,8 +79,7 @@ Diagram2::setName(const Glib::ustring &sname)
 {
     if (!m_sname) {
         m_sname = psc::mem::make_active<psc::gl::Text2>(GL_TRIANGLES, naviContext, m_font);
-        auto lsname = m_sname.lease();
-        if (lsname) {
+        if (auto lsname = m_sname.lease()) {
             lsname->setTextContext(m_textCtx);
             Position ptn(0.0f, m_diagramHeight - m_font->getLineHeight() * 0.007f, 0.0f);
             lsname->setPosition(ptn);
@@ -89,13 +87,11 @@ Diagram2::setName(const Glib::ustring &sname)
             lsname->setName(Glib::ustring::sprintf("m_sname %s", sname));
         }
         auto base = getBase();
-        auto lbase = base.lease();
-        if (lbase) {
+        if (auto lbase = base.lease()) {
             lbase->addGeometry(m_sname);
         }
     }
-    auto lsname = m_sname.lease();
-    if (lsname) {
+    if (auto lsname = m_sname.lease()) {
         lsname->setText(sname);
     }
 }
@@ -107,8 +103,8 @@ Diagram2::fill_data(
       , Gdk::RGBA *color
       , gfloat zOffs, gfloat yOffs)
 {
-    auto lgeom = geom.lease();
-    if (lgeom) {
+    if (auto lgeom = geom.lease()) {
+        lgeom->addReserve(m_size*6u, 0u);
         Color c((gfloat)color->get_red(), (gfloat)color->get_green(), (gfloat)color->get_blue());
         lgeom->deleteVertexArray();
         for (guint i = 0; i < m_size - 1; ++i) {
@@ -125,9 +121,9 @@ aptrGeom2
 Diagram2::createBase(gfloat zOffs, gfloat yOffs)
 {
     auto geom = psc::mem::make_active<psc::gl::Geom2>(GL_TRIANGLES, naviContext);
-    auto lgeom = geom.lease();
-    if (lgeom) {
+    if (auto lgeom = geom.lease()) {
         // Base
+        lgeom->addReserve(12u, 0u);
         Color c(0.2f, 0.2f, 0.2f);
         Position p1(index2x(0       ), value2y(0.f)-0.002f, zOffs);
         Position p2(index2x(m_size-1), value2y(0.f)-0.002f, zOffs + m_StripeWidth);
@@ -139,8 +135,7 @@ Diagram2::createBase(gfloat zOffs, gfloat yOffs)
         lgeom->create_vao();
         Glib::ustring name{"base "};
         if (m_sname) {
-            auto lname = m_sname.lease();
-            if (lname) {
+            if (auto lname = m_sname.lease()) {
                 name += lname->getText();
             }
         }
@@ -154,8 +149,7 @@ void
 Diagram2::fill_buffers(guint idx, const std::shared_ptr<Buffer<double>> &data, Gdk::RGBA *color)
 {
     auto base = getBase();
-    auto lbase = base.lease();
-    if (lbase) {
+    if (auto lbase = base.lease()) {
         while (m_values.size() <= idx) {
             auto geom = psc::mem::make_active<psc::gl::Geom2>(GL_TRIANGLES, naviContext);
             lbase->addGeometry(geom);
@@ -163,8 +157,7 @@ Diagram2::fill_buffers(guint idx, const std::shared_ptr<Buffer<double>> &data, G
         }
         auto geom = m_values[idx];
         fill_data(geom, data, color, 0.0f, -0.001f*idx);
-        auto lgeom = geom.lease();
-        if (lgeom) {
+        if (auto lgeom = geom.lease()) {
             lgeom->setName(Glib::ustring::sprintf("data %d %s", idx, m_sname.get()->getText()));
         }
     }
@@ -184,42 +177,36 @@ Diagram2::setMaxs(const Glib::ustring &pmax, const Glib::ustring &smax)
 {
     if (!m_pmax) {
         m_pmax = psc::mem::make_active<psc::gl::Text2>(GL_TRIANGLES, naviContext, m_font);
-        auto lpmax = m_pmax.lease();
-        if (lpmax) {
+        if (auto lpmax = m_pmax.lease()) {
             lpmax->setTextContext(m_textCtx);
             Position ptm(-1.0f, m_diagramHeight - m_font->getLineHeight() * 0.004f, 0.0f);
             lpmax->setPosition(ptm);
             lpmax->setScale(0.006f);
             lpmax->setName("m_pmax");
             auto base = getBase();
-            auto lbase = base.lease();
-            if (lbase) {
+            if (auto lbase = base.lease()) {
                 lbase->addGeometry(m_pmax);
             }
         }
     }
     if (!m_smax) {
         m_smax = psc::mem::make_active<psc::gl::Text2>(GL_TRIANGLES, naviContext, m_font);
-        auto lsmax = m_smax.lease();
-        if (lsmax) {
+        if (auto lsmax = m_smax.lease()) {
             lsmax->setTextContext(m_textCtx);
             Position pti(-1.0f, m_diagramHeight - 2.0f*m_font->getLineHeight() * 0.004f, 0.0f);
             lsmax->setPosition(pti);
             lsmax->setScale(0.006f);
             lsmax->setName("m_smax");
             auto base = getBase();
-            auto lbase = base.lease();
-            if (lbase) {
+            if (auto lbase = base.lease()) {
                 lbase->addGeometry(m_smax);
             }
         }
     }
-    auto lpmax = m_pmax.lease();
-    if (lpmax) {
+    if (auto lpmax = m_pmax.lease()) {
         lpmax->setText(pmax);
     }
-    auto lsmax = m_smax.lease();
-    if (lsmax) {
+    if (auto lsmax = m_smax.lease()) {
         lsmax->setText(smax);
     }
     //Position &pos = getBase()->getPos();

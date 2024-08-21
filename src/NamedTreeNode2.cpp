@@ -114,8 +114,7 @@ NamedTreeNode2::createLineDown(NaviContext *shaderContext, float y)
                 m_lineDown.resetAll();
             }
             m_lineDown = psc::mem::make_active<Geom2>(GL_LINES, shaderContext);
-            auto llineDown = m_lineDown.lease();
-            if (llineDown) {
+            if (auto llineDown = m_lineDown.lease()) {
                 Position p1{0.0f, 0.0f, 0.0f};
                 Position p2{0.0f, y, 0.0f};
                 Color c(LINE_COLOR, LINE_COLOR, LINE_COLOR);
@@ -123,8 +122,7 @@ NamedTreeNode2::createLineDown(NaviContext *shaderContext, float y)
                 llineDown->create_vao();
                 llineDown->setName("NamedTreeNode2.lineDown");
             }
-            auto lgeo = m_geo.lease();
-            if (lgeo) {
+            if (auto lgeo = m_geo.lease()) {
                 lgeo->addGeometry(m_lineDown);
             }
             m_lastY = y;
@@ -143,22 +141,19 @@ NamedTreeNode2::getTreeGeometry(
     if (!m_geo) {
         m_geo = psc::mem::make_active<Geom2>(GL_TRIANGLES, shaderContext);
         auto text = psc::mem::make_active<Text2>(GL_TRIANGLES, shaderContext, pFont);
-        auto ltext = text.lease();
-        if (ltext) {
+        if (auto ltext = text.lease()) {
             ltext->setTextContext(txtCtx);
             ltext->setText(getDisplayName());
             ltext->setScale(0.005f);
             Position pt(0.10f, -0.05f, 0.0f);
             ltext->setPosition(pt);
         }
-        auto lgeo = m_geo.lease();
-        if (lgeo) {
+        if (auto lgeo = m_geo.lease()) {
             lgeo->addGeometry(text);
             lgeo->setName("NamedTreeNode2.geo");
             if (m_parent) {
                 auto lineLeft = psc::mem::make_active<Geom2>(GL_LINES, shaderContext);
-                auto llineLeft = lineLeft.lease();
-                if (llineLeft) {
+                if (auto llineLeft = lineLeft.lease()) {
                     Position p1{0.0f, 0.02f, 0.0f};
                     Position p2{-NamedTreeNode2::NODE_INDENT, 0.02f, 0.0f};
                     Color c(LINE_COLOR, LINE_COLOR, LINE_COLOR);
@@ -171,8 +166,7 @@ NamedTreeNode2::getTreeGeometry(
                 lgeo->addGeometry(m_lineDown);
             }
             if (pParentGeo) {
-                auto lParent = pParentGeo.lease();
-                if (lParent) {
+                if (auto lParent = pParentGeo.lease()) {
                     lParent->addGeometry(m_geo);
                 }
             }
@@ -199,8 +193,7 @@ NamedTreeNode2::render(NaviContext *shaderContext
     for (auto chld : getChildren()) {
         pos.y += NODE_LINESPACE;
         auto chldGeo = chld->getTreeGeometry(shaderContext, txtCtx, pFont, treeGeo);
-        auto lchldGeo = chldGeo.lease();
-        if (lchldGeo) {
+        if (auto lchldGeo = chldGeo.lease()) {
             lchldGeo->setPosition(pos);
         }
         lastY = pos.y;

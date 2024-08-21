@@ -117,8 +117,7 @@ bool
 FallShapeGeometry2::match(const psc::mem::active_ptr<TreeGeometry2>& treeGeo) {
     bool ret = false;
     if(auto fallShape = psc::mem::dynamic_pointer_cast<FallShapeGeometry2>(treeGeo)) {
-        auto lfallShape = fallShape.lease();
-        if (lfallShape) {
+        if (auto lfallShape = fallShape.lease()) {
             ret = lfallShape->m_start == m_start &&
                   lfallShape->m_size == m_size &&
                   lfallShape->m_stage == m_stage &&

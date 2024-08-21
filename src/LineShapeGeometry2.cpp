@@ -120,8 +120,7 @@ LineShapeGeometry2::create(const std::shared_ptr<TreeNode2>& node, LineShapeRend
     if (parent != nullptr) {
         psc::mem::active_ptr<TreeGeometry2> parentGeom = parent->getTreeGeometry();
         if (auto parentLineShape = dynamic_pointer_cast<LineShapeGeometry2>(parentGeom)) {
-            auto lParentLineShape = parentLineShape.lease();
-            if (lParentLineShape) {
+            if (auto lParentLineShape = parentLineShape.lease()) {
                 Position pl0(lParentLineShape->m_mid);
                 pl0 += forward;
                 Position pl1(pl0);
@@ -155,9 +154,8 @@ LineShapeGeometry2::create(const std::shared_ptr<TreeNode2>& node, LineShapeRend
 bool
 LineShapeGeometry2::match(const psc::mem::active_ptr<TreeGeometry2>& treeGeo) {
     auto lineShapeGeo = dynamic_pointer_cast<LineShapeGeometry2>(treeGeo);
-    auto lLineShapeGeo = lineShapeGeo.lease();
     bool ret = false;
-    if (lLineShapeGeo) {
+    if (auto lLineShapeGeo = lineShapeGeo.lease()) {
         ret = lLineShapeGeo->m_start == m_start
            && lLineShapeGeo->m_width == m_width
            && lLineShapeGeo->m_size == m_size

@@ -70,8 +70,7 @@ LineShapeRenderer2::createLineShape(const std::shared_ptr<TreeNode2>& node, Posi
         node->setTreeGeometry(nodeGeo);
     }
     else {
-        auto ltempGeo = tempGeo.lease();
-        if (ltempGeo) {
+        if (auto ltempGeo = tempGeo.lease()) {
             ltempGeo->update(start, width, size, node, depth);
             toUpdate = !ltempGeo->match(nodeGeo);
         }
@@ -98,8 +97,7 @@ LineShapeRenderer2::createLineShape(const std::shared_ptr<TreeNode2>& node, Posi
     if (parentNode) {        // in any case rebuild structure as parent may have changed
         auto parentGeo = parentNode->getTreeGeometry();
         //std::cout << "add " << std::hex << tGeo << " to " << std::hex << parentGeo << std::endl;
-        auto lParentGeo = parentGeo.lease();
-        if (lParentGeo) {
+        if (auto lParentGeo = parentGeo.lease()) {
             lParentGeo->addGeometry(nodeGeo);       // replicate structure on geometries to allow breaking out tree parts
         }
     }

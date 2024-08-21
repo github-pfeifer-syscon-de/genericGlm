@@ -514,8 +514,7 @@ Geom2::addGeometry(aptrGeom2 geo)
         std::cerr << "Adding geometry to itself " << typeid(geo.get()).name() << "!" << std::endl;
         return;     // or throw exception ?
     }
-    auto lgeo = geo.lease();
-    if (lgeo) {
+    if (auto lgeo = geo.lease()) {
         if (lgeo->m_master == this) {     // already contained (cheaper than iterating)
             return;
         }

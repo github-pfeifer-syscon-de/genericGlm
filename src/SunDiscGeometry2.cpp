@@ -124,12 +124,13 @@ SunDiscGeometry2::match(const psc::mem::active_ptr<TreeGeometry2>& treeGeo)
 {
     bool ret = false;
     if(auto sundisc = psc::mem::dynamic_pointer_cast<SunDiscGeometry2>(treeGeo)) {
-        auto lsundisc = sundisc.lease();
-        ret = lsundisc->m_inner == m_inner &&
-                lsundisc->m_start == m_start &&
-                lsundisc->m_size == m_size &&
-                lsundisc->m_stage == m_stage &&
-                lsundisc->m_load == m_load;
+        if (auto lsundisc = sundisc.lease()) {
+            ret = lsundisc->m_inner == m_inner &&
+                    lsundisc->m_start == m_start &&
+                    lsundisc->m_size == m_size &&
+                    lsundisc->m_stage == m_stage &&
+                    lsundisc->m_load == m_load;
+        }
 //        if (!ret) {
 //            std::cout << "inner " << sundisc->m_inner << "," << m_inner
 //                      << " start " << sundisc->m_start << "," << m_start
