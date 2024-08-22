@@ -31,10 +31,7 @@ namespace gl {
 #include "Diagram2.hpp"
 
 Diagram2::Diagram2(guint _size, NaviContext *_naviContext, TextContext *_textCtx)
-: m_StripeWidth{0.3f}
-, m_diagramHeight{0.7f}
-, m_diagramWidth{2.0f}
-, m_values()
+: m_values()
 , naviContext{_naviContext}
 , m_textCtx{_textCtx}
 , m_size{_size}

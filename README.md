@@ -22,20 +22,6 @@ For windows (get msys2 https://www.msys2.org/) the files shoud adapt use e.g.<br
 <pre>
   ./configure --prefix=/mingw64
 </pre>
-The pkgconfig support for glm may be missing depending on version/distro
-so you might want to place the following in /usr/lib/pkgconfig/glm.pc
-(for windows replace /usr with /mingw64) and of course install it ;)
-<pre>
-prefix=/usr
-exec_prefix=${prefix}
-includedir=${prefix}/include
-Name: glm
-Description: Basic inamging function support lib.
-Requires:
-Version: 1.0.0
-Libs:
-Cflags: -I${includedir}
-</pre>
 For Debian you may need the following steps (prefix # execute with sudo/root prefix > as user):
 <pre>
 # apt install git build-essential automake libtool

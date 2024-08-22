@@ -18,7 +18,7 @@
 #pragma once
 
 #include "GenericGlmCompat.hpp"
-#include <glm/mat4x4.hpp> // glm::mat4
+#include <glm/mat4x4.hpp>           // glm::mat4
 
 class Rotational {
 public:

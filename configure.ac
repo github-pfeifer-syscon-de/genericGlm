@@ -56,9 +56,17 @@ dnl PKG_CHECK_MODULES(GTKMM,[genericImg])
 dnl already imported with genericImg
 dnl PKG_CHECK_MODULES([GLIBMM], [glibmm-2.4 giomm-2.4])
 
-depend_glm="glm"
-AC_SUBST([depend_glm])
-PKG_CHECK_MODULES([GLM], [$depend_glm])
+dnl use header check as .pc is not used by default...
+dnl depend_glm="glm"
+dnl AC_SUBST([depend_glm])
+dnl PKG_CHECK_MODULES([GLM], [$depend_glm])
+
+AC_LANG_PUSH([C++])
+AC_CHECK_HEADER([glm/glm.hpp], [found_glm_headers=yes;])
+AC_LANG_POP
+
+AS_IF([test "x$found_glm_headers" != "xyes"],
+        [AC_MSG_ERROR([Unable to find the glm/glm.hpp headers, e.g. install glm package])])
 
 depend_genericimg="genericimg >= 0.3.1"
 AC_SUBST([depend_genericimg])

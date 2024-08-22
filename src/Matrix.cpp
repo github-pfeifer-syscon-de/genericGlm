@@ -14,11 +14,11 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-#include <glib.h>
-#include <stdio.h>
+
 #include <iostream>
 
-#include <math.h>
+#include <cmath>
+#include <glm/trigonometric.hpp>    // glm::radians
 
 #include "Matrix.hpp"
 
@@ -48,25 +48,25 @@ Rotational::add(const Rotational &rot)
 float
 Rotational::deg2radians(float deg)
 {
-    return static_cast<float>(deg * G_PI / 180.0);
+    return glm::radians(deg);
 }
 
 float
 Rotational::phiRadians()
 {
-    return deg2radians(phi);
+    return glm::radians(phi);
 }
 
 float
 Rotational::thetaRadians()
 {
-    return deg2radians(theta);
+    return glm::radians(theta);
 }
 
 float
 Rotational::psiRadians()
 {
-    return deg2radians(psi);
+    return glm::radians(psi);
 }
 
 float

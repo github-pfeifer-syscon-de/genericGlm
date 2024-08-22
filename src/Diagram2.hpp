@@ -67,9 +67,9 @@ public:
     }
     aptrGeom2 getBase();
 protected:
-    gfloat m_StripeWidth;
-    gfloat m_diagramHeight;
-    gfloat m_diagramWidth;
+    gfloat m_StripeWidth{0.3f};
+    gfloat m_diagramHeight{0.7f};
+    gfloat m_diagramWidth{2.0f};
     aptrGeom2 m_base;
     std::vector<psc::gl::aptrGeom2> m_values;
     ptrFont2 m_font;
