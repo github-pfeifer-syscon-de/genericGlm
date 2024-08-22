@@ -399,6 +399,7 @@ Geom2::create_vao() {
         glBufferData(GL_ELEMENT_ARRAY_BUFFER, m_numIndex * sizeof (GLushort), &m_indexes[0], GL_STATIC_DRAW);
         checkError("add buf_data");
         m_indexes.clear();
+        m_indexes.shrink_to_fit();  // this sets the capacity to 0
     }
 
     glBindVertexArray(0);
@@ -417,6 +418,7 @@ Geom2::create_vao() {
     //std::cerr << "Create vao " << m_vao << std::endl;
 
     m_vertexes.clear(); // these we don't need any longer
+    m_vertexes.shrink_to_fit();  // this sets the capacity to 0
 }
 
 guint
