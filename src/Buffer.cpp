@@ -42,7 +42,6 @@ template<class T> void
 Buffer<T>::set(T _value)
 {
     set(m_data.size()-1, _value);
-	m_sum += _value;	// account for added value
 }
 
 template<class T> void
@@ -59,7 +58,9 @@ template<class T> void
 Buffer<T>::set(uint32_t idx, T _value)
 {
     if (idx < m_data.size()) {
+        T oldValue = m_data[idx];
         m_data[idx] = _value;
+        m_sum += _value - oldValue;	// account for added value
     }
 }
 

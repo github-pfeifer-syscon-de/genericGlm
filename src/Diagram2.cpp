@@ -130,12 +130,10 @@ Diagram2::createBase(gfloat zOffs, gfloat yOffs)
         Position p4(index2x(0), value2y(1.0f) - 0.002f, zOffs + m_StripeWidth);
         lgeom->addRect(p3, p4, c);
         lgeom->create_vao();
-        Glib::ustring name{"base "};
-        if (m_sname) {
-            if (auto lname = m_sname.lease()) {
-                name += lname->getText();
-            }
-        }
+        Glib::ustring name{"base diagram"};
+        //if (auto lname = m_sname.lease()) {   // this is not yet set
+        //    name += lname->getText();
+        //}
         lgeom->setName(name);
         checkError("Error create vao base");
     }
@@ -150,13 +148,17 @@ Diagram2::fill_buffers(guint idx, const std::shared_ptr<Buffer<double>> &data, G
         while (m_values.size() <= idx) {
             auto geom = psc::mem::make_active<psc::gl::Geom2>(GL_TRIANGLES, naviContext);
             lbase->addGeometry(geom);
+            if (auto lgeom = geom.lease()) {
+                std::string name;
+                if (auto ltext = m_sname.lease()) {
+                    name = ltext->getText();
+                }
+                lgeom->setName(Glib::ustring::sprintf("data %d %s", m_values.size(), name));
+            }
             m_values.push_back(geom);
         }
         auto geom = m_values[idx];
         fill_data(geom, data, color, 0.0f, -0.001f*idx);
-        if (auto lgeom = geom.lease()) {
-            lgeom->setName(Glib::ustring::sprintf("data %d %s", idx, m_sname.get()->getText()));
-        }
     }
 }
 

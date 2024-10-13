@@ -475,13 +475,21 @@ Geom2::display(const Matrix &mvp)  //[[maybe_unused]]
     if (!m_visible) {
         return;
     }
-    if (m_vao == 0)
-    {
-        std::cerr << "Geometry vao is 0 num"
-                  << " vertexes " <<  m_numVertex
-                  << " type " << typeid(this).name()
-                  << " name " << m_name
-                  << std::endl;
+    if (m_vao == 0) {
+        auto geom = this;
+        for (int indent = 0; geom != nullptr; ++indent) {
+            std::string s;
+            for (int i = 0; i < indent; ++i) {
+                s += "  ";
+            }
+            std::cerr << s
+                      << "Geometry vao is 0"
+                      << " num vertexes " <<  geom->m_numVertex
+                      << " type " << typeid(*geom).name()
+                      << " name \"" << geom->m_name << "\""
+                      << std::endl;
+            geom = geom->m_master;
+        }
 		return;
     }
     if (m_numVertex == 0)

@@ -25,6 +25,14 @@
 #include <windef.h>
 #endif
 
+// alternatives
+// #include <numbers>
+// std::numbers::pi;
+// #include <glm/ext.hpp>
+// glm::pi;
+// glm::pi_over_2
+// glm::quarter_pi;
+
 #ifndef M_PI
 #define M_PI G_PI
 #endif
