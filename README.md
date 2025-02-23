@@ -41,6 +41,7 @@ for Raspi configure with:
 For windows (get msys2 https://www.msys2.org/) the files shoud adapt use e.g.<br>
 (use "msys2 mingw64" window/shell see tooltip)<br>
 <pre>
+pacman -S mingw-w64-x86_64-glm
 autoreconf -fis
 ./configure --prefix=/mingw64
 make

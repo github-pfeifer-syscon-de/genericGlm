@@ -17,7 +17,7 @@ AC_SUBST([version_info])
 
 AC_CONFIG_HEADERS([config.h])
 
-AM_INIT_AUTOMAKE([1.11])
+AM_INIT_AUTOMAKE([1.11 foreign])
 
 AM_SILENT_RULES([yes])
 
@@ -29,8 +29,7 @@ dnl we depend on c++20 in some places,
 dnl with an older compiler, c++17 might work as well with some adaptions.
 AX_CXX_COMPILE_STDCXX([20], [noext], [optional])
 
-AC_DISABLE_STATIC
-
+dnl ([win32-dll]) might be an option to use, but as the dependent libraries are not shared ... this fails in the end
 LT_INIT
 
 AC_CANONICAL_HOST
