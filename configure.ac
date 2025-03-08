@@ -17,7 +17,7 @@ AC_SUBST([version_info])
 
 AC_CONFIG_HEADERS([config.h])
 
-AM_INIT_AUTOMAKE([1.11 foreign])
+AM_INIT_AUTOMAKE([1.11])
 
 AM_SILENT_RULES([yes])
 
@@ -29,7 +29,8 @@ dnl we depend on c++20 in some places,
 dnl with an older compiler, c++17 might work as well with some adaptions.
 AX_CXX_COMPILE_STDCXX([20], [noext], [optional])
 
-dnl ([win32-dll]) might be an option to use, but as the dependent libraries are not shared ... this fails in the end
+AC_DISABLE_STATIC
+
 LT_INIT
 
 AC_CANONICAL_HOST
@@ -74,11 +75,14 @@ PKG_CHECK_MODULES([GENERICIMG], [$depend_genericimg])
 if test "$host_os" = "mingw32" ; then
     AC_SUBST(EXTRA_LDFLAGS, "-lglu32 -no-undefined")
     depend_glu=""
+    link_glu="-lglu32"
 else
     PKG_CHECK_MODULES(GLU, [glu])
     depend_glu="glu"
+    link_glu=""
 fi
 AC_SUBST([depend_glu])
+AC_SUBST([link_glu])
 
 AC_CONFIG_FILES([
 Makefile
