@@ -56,3 +56,5 @@
 /test/buf_test
 /test/buf_test.trs
 /test/.libs/buf_test
+/html/
+/analyze.sh

@@ -163,13 +163,13 @@ ShaderContext::createShader(int shader_type,
                                      type,
                                      buffer);
         error = Glib::Error(GLAREA_ERROR, GLAREA_ERROR_SHADER_COMPILATION, msg);
+		// it can be helpful to see what shader did fail, as we have some around ....
+		fprintf(stderr, "type %s status %s\n----\n%s\n-------\n", type, msg, (char*)source);
         g_free(msg);
         g_free(buffer);
 
         glDeleteShader(shader);
         shader = 0;
-		// it can be helpful to see what shader did fail, as we have some around ....
-		fprintf(stderr, "type %s status %s\n----\n%s\n-------\n", type, msg, (char*)source);
     }
 
     return shader;
