@@ -1,6 +1,6 @@
 /* -*- Mode: c++; indent-tabs-mode: t; c-basic-offset: 4; tab-width: 4 -*-  */
 /*
- * Copyright (C) 2024 RPf <gpl3@pfeifer-syscon.de>
+ * Copyright (C) 2024 RPf 
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -112,13 +112,13 @@ protected:
     Position m_min,m_max;
     Position v_min,v_max;
     Glib::ustring m_name;
-private:
     unsigned int m_vao;
     Vertexts m_vertexes; // temporary vertex buffer during building
     Indexes m_indexes;
     unsigned int m_numVertex;       // number of elements
     unsigned int m_stride_size;
     unsigned int m_numIndex;
+private:
 
     static constexpr Color defCol{1.0f, 1.0f, 1.0f};
     static constexpr Vector defNor{0.0f, 1.0f, 0.0f};

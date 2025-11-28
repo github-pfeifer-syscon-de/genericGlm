@@ -36,7 +36,7 @@ LT_INIT
 AC_CANONICAL_HOST
 AC_MSG_NOTICE([host_os $host_os])
 
-depend_fontconfig="fontconfig"
+depend_fontconfig="fontconfig freetype2"
 AC_SUBST([depend_fontconfig])
 PKG_CHECK_MODULES(FONTCONFIG, [$depend_fontconfig])
 

@@ -1,6 +1,6 @@
 /* -*- Mode: c++; indent-tabs-mode: t; c-basic-offset: 4; tab-width: 4 -*-  */
 /*
- * Copyright (C) 2024 RPf <gpl3@pfeifer-syscon.de>
+ * Copyright (C) 2024 RPf 
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -41,11 +41,11 @@ namespace gl {
 
 class Font2;
 
-typedef std::shared_ptr<Font2> ptrFont2;
+using ptrFont2 = std::shared_ptr<Font2>;
 
 
 // unordered map will be faster on access
-typedef std::unordered_map<gunichar, ptrGlyph2> Glyphs;
+using Glyphs = std::unordered_map<gunichar, ptrGlyph2>;
 
 /*
  * Basic handling for fonts obtained from fontconfig.
@@ -87,10 +87,6 @@ private:
     mutable std::mutex m_MutexGlyph;
 
 };
-
-
-
-
 
 } /* namespace gl */
 } /* namespace psc */
