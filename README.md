@@ -38,12 +38,11 @@ for Raspi configure with:
 
 ## Windows
 
-For windows (get msys2 https://www.msys2.org/) the files shoud adapt use e.g.<br>
-(use "msys2 mingw64" window/shell see tooltip)<br>
+For windows (get msys2 https://www.msys2.org/) the files shoud adapt:
 <pre>
-pacman -S mingw-w64-x86_64-glm
+pacman -S ${MINGW_PACKAGE_PREFIX}-glm
 autoreconf -fis
-./configure --prefix=/mingw64
+./configure --prefix=${MINGW_PREFIX}
 make
 </pre>
 
