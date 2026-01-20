@@ -1,4 +1,4 @@
-/* -*- Mode: c++; indent-tabs-mode: t; c-basic-offset: 4; tab-width: 4; coding: utf-8; -*-  */
+/* -*- Mode: c++; c-basic-offset: 4; tab-width: 4; coding: utf-8; -*-  */
 /*
  * Copyright (C) 2023 RPf 
  *
@@ -20,11 +20,9 @@
 
 #include "active_ptr.hpp"
 
-namespace psc {
-namespace mem {
+namespace psc::mem {
 
 
 
 
-} /* namespace mem */
-} /* namespace psc */
+} // namespace psc::mem

@@ -27,8 +27,7 @@
 
 
 
-namespace psc {
-namespace mem {
+namespace psc::mem {
 
 static /*constexpr*/ bool active_debug{false};
 
@@ -560,5 +559,4 @@ static /*constexpr*/ bool active_debug{false};
         return S();
     }
 
-} /* namespace mem */
-} /* namespace psc */
+} // namespace psc::mem
