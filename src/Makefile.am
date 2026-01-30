@@ -19,27 +19,14 @@ libgenericglm_la_LDFLAGS = \
 	@EXTRA_LDFLAGS@ \
 	-version-info @version_info@
 
-# this is a no-tech approach,
-#  if you don't like gcc/clang, it this should also work without these options
-#  most options originate from https://github.com/cpp-best-practices/cmake_template/blob/main/cmake/Hardening.cmake
-#    -W... the usual warings
-#    GLIBC++ Assertions (vector[], string[], ...) enabled
-#    g++/clang -fstack-protector-strong enabled
-#    g++/clang -fcf-protection enabled
-#    undefined behaviour sanitizer
+libgenericglm_la_CFLAGS = $(WARN_CFLAGS)
+libgenericglm_la_CXXFLAGS = $(WARN_CXXFLAGS)
+
 if RELEASE
-libgenericglm_la_CXXFLAGS = -mtune=native -march=native -O3
+libgenericglm_la_CXXFLAGS += $(OPTIM_CXXFLAGS)
 else
-libgenericglm_la_CFLAGS = -Wall
-libgenericglm_la_CXXFLAGS = -Wall \
-	    -Wextra \
-	    -Wno-unused-parameter \
-        -Wpedantic \
-        -D_GLIBCXX_ASSERTIONS \
-        -fstack-protector-strong \
-        -fcf-protection \
-        -fsanitize=undefined
-libgenericglm_la_LDFLAGS += -fsanitize=undefined
+libgenericglm_la_CXXFLAGS += $(INSTUMENT_CXXFLAGS)
+libgenericglm_la_LDFLAGS += $(INSTUMENT_LINKFLAGS)
 endif
 
 libgenericglm_la_SOURCES = \
