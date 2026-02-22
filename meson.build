@@ -21,8 +21,15 @@ else
 endif
 
 cc = meson.get_compiler('c')
+disable_flags = [   # limit the compiler noisiness
+    '-Wno-unused-parameter'
+]
+foreach cflag : disable_flags
+    if cc.has_argument(cflag)
+        add_project_arguments(cflag, language: ['c', 'cpp'])
+    endif
+endforeach
 if target_machine.system() == 'windows'
-  #glu_deps = cc.find_library('glu32', dirs: 'c:\windows\system32', required: true)
     glu_deps = cc.find_library('glu32', required: true)
 else
     glu_deps = dependency('glu')
