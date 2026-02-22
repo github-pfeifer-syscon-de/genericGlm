@@ -20,15 +20,14 @@ else
     opengl_deps = dependency('epoxy')
 endif
 
-extra_libs = []
+cc = meson.get_compiler('c')
 if target_machine.system() == 'windows'
-    glu_deps = declare_dependecy()
-    extra_libs += 'glu32'
+  #glu_deps = cc.find_library('glu32', dirs: 'c:\windows\system32', required: true)
+    glu_deps = cc.find_library('glu32', required: true)
 else
     glu_deps = dependency('glu')
 endif
 
-cc = meson.get_compiler('c')
 cc.has_header('glm/glm.hpp', required: true)
 
 pkgdatadir = join_paths(get_option('prefix'), get_option('datadir'), meson.project_name())
@@ -43,11 +42,14 @@ configure_file ( output : meson.project_name() + '_config.h'
 
 subdir('include')
 subdir('src')
-deps = [
+pkg_deps = [
       genericimg_deps
     , fontconfig_deps
     , thread_deps
     , opengl_deps
+    ]
+deps = [
+      pkg_deps
     , glu_deps
     ]
 project_target = both_libraries(meson.project_name()
@@ -56,7 +58,6 @@ project_target = both_libraries(meson.project_name()
     , dependencies: deps
     , gnu_symbol_visibility : 'default'         # visibility was hidden, but selected visible for compatibility
     , include_directories : public_headers
-    , link_with: extra_libs
     , version : meson.project_version())
 subdir('test')
 
@@ -67,7 +68,7 @@ pkg_mod.generate(
   , description : project_description
   , subdirs : meson.project_name()
   , libraries : project_target
-  , requires : deps
+  , requires : pkg_deps
 )
 
 # Make this library usable as a Meson subproject.
