@@ -1,17 +1,14 @@
+
 # genericGlm
-A OpenGL abstraction for my projects
+A openGL(R) abstraction for my projects
 Allow using a text-only shader (to keep text in simple color, without light).
 
 22.9.22 for configure:
-     added --with-gles using GL ES 3 e.g. useful on Raspi's (requires same use on programs)
+     added option -Dgles=true to use GL ES 3 e.g. useful on Raspi's (suggestion same use on programs)
 
 ## Minimum requirements
 
 - requires genericImg so read&build&install it first.
-- the project can be downloaded with
-<pre>
-git clone https://github.com/github-pfeifer-syscon-de/genericGlm
-</pre>
 
 ## Debian
 
@@ -25,15 +22,15 @@ apt-get install libglm-dev libglu1-mesa-dev
 
 To build use from project dir:
 <pre>
-autoreconf -fis
-./configure --prefix=/usr
-make
+meson setup build -Dprefix=/usr
+cd build
+meson compile
 </pre>
 
 ## Raspi
-for Raspi configure with:
+for Raspi setup with:
 <pre>
-  ./configure --prefix=/usr --with-gles
+meson setup build -Dprefix=/usr -Dgles=true
 </pre>
 
 ## Windows
@@ -41,16 +38,16 @@ for Raspi configure with:
 For windows (get msys2 https://www.msys2.org/) the files shoud adapt:
 <pre>
 pacman -S ${MINGW_PACKAGE_PREFIX}-glm
-autoreconf -fis
-./configure --prefix=${MINGW_PREFIX}
-make
+meson setup build -Dprefix=${MINGW_PREFIX}
+cd build
+meson compile
 </pre>
 
 ## Any system
 
 The lib requires to be installed before use so (on linux run as root):
 <pre>
-make install
+meson install
 </pre>
 
 ## Navigation

@@ -1,6 +1,6 @@
 /* -*- Mode: c++; indent-tabs-mode: t; c-basic-offset: 4; tab-width: 4; coding: utf-8; -*-  */
 /*
- * Copyright (C) 2024 RPf 
+ * Copyright (C) 2024 RPf
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -989,7 +989,7 @@ Tex2::create(Glib::RefPtr<Gdk::Pixbuf> pix)
 		printf("Scale w %d h %d to %d GL_MAX_TEXTURE_SIZE\n", pix->get_width(), pix->get_height(), maxTextureSize);
 		pix = pix->scale_simple(maxTextureSize, maxTextureSize, Gdk::InterpType::INTERP_BILINEAR);
 	}
-	#if USE_GLES
+    #ifdef USE_GLES
 	// more sensitive to power of two or not,
 	// as it seems not true 2048x1024 is accept nicely
 	// but more sensitive to weired UV coords

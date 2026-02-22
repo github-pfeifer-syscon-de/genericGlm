@@ -19,7 +19,7 @@
 // fix select openGL implementation GL ES 3 or generic
 #pragma once
 
-#include "config.h"
+#include "genericglm_config.h"
 
 #ifdef __WIN32__    // compat msys2
 #include <windef.h>
@@ -45,7 +45,7 @@
 #define M_PI_4 G_PI_4
 #endif
 
-#if USE_GLES
+#ifdef USE_GLES
 #include <GLES3/gl3.h>
 #define GLAPIENTRY
 #else

@@ -1,0 +1,37 @@
+
+
+sources = files(
+	  'BaseDialog.cpp'
+	, 'FbShaderContext.cpp'
+	, 'Displayable.cpp'
+	, 'GeometryContext.cpp'
+	, 'glarea-error.c'
+	, 'PositionDbl.cpp'
+	, 'MarkContext.cpp'
+	, 'Matrix.cpp'
+	, 'NaviContext.cpp'
+	, 'NaviGlArea.cpp'
+	, 'Scene.cpp'
+	, 'ShaderContext.cpp'
+	, 'TextContext.cpp'
+	, 'Buffer.cpp'
+	, 'active_ptr.cpp'
+	, 'Geom2.cpp'
+	, 'Diagram2.cpp'
+	, 'Font2.cpp'
+	, 'Glyph2.cpp'
+	, 'Polygon2.cpp'
+	, 'Text2.cpp'
+	, 'TreeRenderer2.cpp'
+	, 'LineShapeRenderer2.cpp'
+	, 'LineShapeGeometry2.cpp'
+	, 'SunDiscRenderer2.cpp'
+	, 'SunDiscGeometry2.cpp'
+	, 'FallShapeRenderer2.cpp'
+	, 'FallShapeGeometry2.cpp'
+	, 'TreeGeometry2.cpp'
+	, 'TextTreeGeometry2.cpp'
+	, 'TreeNode2.cpp'
+	, 'NamedTreeNode2.cpp')
+
+

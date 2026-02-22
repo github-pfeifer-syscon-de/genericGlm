@@ -1,0 +1,3 @@
+# choose
+option('gles', type : 'boolean', value : false
+      , description : 'Use openGL-ES functions (useful for Raspis)')
