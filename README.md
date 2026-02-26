@@ -4,7 +4,7 @@ A openGL(R) abstraction for my projects
 Allow using a text-only shader (to keep text in simple color, without light).
 
 22.9.22 for configure:
-     added option -Dgles=true to use GL ES 3 e.g. useful on Raspi's (suggestion same use on programs)
+     added option -Dgles=true to use GL ES 3 e.g. useful on Raspi's (impilies same use on programs)
 
 ## Minimum requirements
 
@@ -49,6 +49,10 @@ The lib requires to be installed before use so (on linux run as root):
 <pre>
 meson install
 </pre>
+If you want to adapt the build to changes use:
+<pre> 
+meson setup build --reconfigure
+</pre> 
 
 ## Navigation
 
