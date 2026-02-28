@@ -21,8 +21,8 @@ else
 endif
 
 cc = meson.get_compiler('c')
-disable_flags = [   # limit the compiler noisiness
-    '-Wno-unused-parameter'
+disable_flags = [
+    '-Wno-unused-parameter'  # limit the compiler noisiness
 ]
 foreach cflag : disable_flags
     if cc.has_argument(cflag)
@@ -42,9 +42,9 @@ add_project_arguments('-DPACKAGE_DATA_DIR="' + pkgdatadir + '"', language: 'cpp'
 public_headers = include_directories('include')
 
 conf = configuration_data()
-conf.set_quoted('VERSION', meson.project_version())     # Surround the version in quotes to make it a C string
-conf.set('USE_GLES', get_option('gles'))
-configure_file ( output : meson.project_name() + '_config.h'
+conf.set_quoted('GENERICGLM_VERSION', meson.project_version())     # Surround the version in quotes to make it a C string
+conf.set       ('USE_GLES', get_option('gles'))
+conf_file=configure_file( output : meson.project_name() + '_config.h'
                , configuration : conf)
 
 subdir('include')
@@ -61,21 +61,21 @@ deps = [
     ]
 project_target = both_libraries(meson.project_name()
     , sources
-    , install : true
-    , dependencies: deps
+    , install               : true
+    , dependencies          : deps
     , gnu_symbol_visibility : 'default'         # visibility was hidden, but selected visible for compatibility
-    , include_directories : public_headers
-    , version : meson.project_version())
+    , include_directories   : public_headers
+    , version               : meson.project_version())
 subdir('test')
 
 pkg_mod = import('pkgconfig')
 pkg_mod.generate(
-    name : meson.project_name()
-  , filebase : meson.project_name()
+    name        : meson.project_name()
+  , filebase    : meson.project_name()
   , description : project_description
-  , subdirs : meson.project_name()
-  , libraries : project_target
-  , requires : pkg_deps
+  , subdirs     : meson.project_name()
+  , libraries   : project_target
+  , requires    : pkg_deps
 )
 
 # Make this library usable as a Meson subproject.
