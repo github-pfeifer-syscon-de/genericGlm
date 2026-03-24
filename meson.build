@@ -4,8 +4,9 @@ project('genericglm', 'c', 'cpp'
                        , 'buildtype=debugoptimized'
                        , 'warning_level=2']
     , license : 'GPL-3.0'
-    , meson_version: '>= 1.9.0'
+    , meson_version: '>= 1.7.0'
     , version: '0.3.2')
+# meson is complaing about the version but this is for backward compatiblity ...
 project_description = 'Common openGL functions for psc projects'
 
 genericimg_deps = dependency('genericimg', version : '>= 0.3.1')
@@ -23,6 +24,7 @@ endif
 cc = meson.get_compiler('c')
 disable_flags = [
     '-Wno-unused-parameter'  # limit the compiler noisiness
+    ,'-Wno-overlength-strings'  # this matters only if you are pedantic
 ]
 foreach cflag : disable_flags
     if cc.has_argument(cflag)
@@ -68,6 +70,17 @@ project_target = both_libraries(meson.project_name()
     , version               : meson.project_version())
 subdir('test')
 
+if meson.version().version_compare('>=1.9')
+    requires = pkg_deps
+else
+    requires = ''   # workaround dependencies meson < 1.9
+    foreach dep : pkg_deps
+        if dep.type_name() == 'pkgconfig'
+            requires += dep.name() + ', '
+        endif
+    endforeach
+endif
+
 pkg_mod = import('pkgconfig')
 pkg_mod.generate(
     name        : meson.project_name()
@@ -75,7 +88,7 @@ pkg_mod.generate(
   , description : project_description
   , subdirs     : meson.project_name()
   , libraries   : project_target
-  , requires    : pkg_deps
+  , requires    : requires
 )
 
 # Make this library usable as a Meson subproject.
